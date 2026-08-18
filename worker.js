@@ -103,7 +103,7 @@ export default {
   }
 };
 
-async function callGemini(prompt, apiKey) {
+async function callGemini(prompt, apiKey, maxTokens = 1000) {
   try {
     const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
     const response = await fetch(geminiUrl, {
@@ -113,7 +113,7 @@ async function callGemini(prompt, apiKey) {
         contents: [{ parts: [{ text: prompt }] }],
         generationConfig: {
           temperature: 0.7,
-          maxOutputTokens: 350
+          maxOutputTokens: maxTokens
         }
       })
     });
