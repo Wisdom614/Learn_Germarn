@@ -29,15 +29,7 @@
                 <div class="brand-title">DeutschLern</div>
             </div>
             
-            <div class="header-actions" style="display:flex; gap:6px; align-items:center;">
-                <button id="voiceAccentBtn" class="level-badge-btn" title="Switch AI Voice Accent">
-                    <span id="currentAccentFlag">🇳🇬</span>
-                    <span id="currentAccentDisplay" class="level-chip">African (NG)</span>
-                </button>
-                <button id="langBadgeBtn" class="level-badge-btn" title="Switch Target Language">
-                    <span id="currentLangFlag">🇩🇪</span>
-                    <span id="currentLangDisplay" class="level-chip">German</span>
-                </button>
+            <div class="header-actions">
                 <button id="levelBadgeBtn" class="level-badge-btn" title="Select CEFR Level">
                     <span>Level</span>
                     <span id="currentLevelDisplay" class="level-chip">A1</span>
@@ -95,8 +87,8 @@
                             Order Coffee
                         </button>
                         <button class="chip-btn" data-prompt="Explain the difference between der, die, and das">
-                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: -2px; margin-right: 4px;"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
-                            Articles (der/die/das)
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: -2px; margin-right: 4px;"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+                            Articles
                         </button>
                         <button class="chip-btn" data-prompt="Practice a short dialogue about shopping">
                             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: -2px; margin-right: 4px;"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path><line x1="3" y1="6" x2="21" y2="6"></line><path d="M16 10a4 4 0 0 1-8 0"></path></svg>
@@ -104,32 +96,21 @@
                         </button>
                     </div>
 
-                    <!-- Chat Input Dock -->
+                    <!-- Input Bar Floating Dock -->
                     <div class="input-dock">
-                        <button id="voiceMicBtn" class="mic-btn" title="Speak in German (Voice Mode)" aria-label="Voice input">
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
-                                <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
-                                <line x1="12" y1="19" x2="12" y2="23"></line>
-                                <line x1="8" y1="23" x2="16" y2="23"></line>
-                            </svg>
+                        <input id="chatInput" type="text" class="dock-input" placeholder="Ask a question or speak in German..." autocomplete="off">
+                        <button id="voiceMicBtn" class="action-btn mic-btn" title="Speak in German">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg>
                         </button>
-                        <input type="text" id="chatInput" class="dock-input" placeholder="Ask a question or speak in German..." aria-label="Chat input">
-                        <button id="chatSendBtn" class="send-btn" aria-label="Send message">
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+                        <button id="chatSendBtn" class="action-btn send-btn" title="Send Message">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
                         </button>
                     </div>
                 </div>
             </section>
 
-            <!-- 2. VOCABULARY TAB -->
+            <!-- 2. VOCABULARY BUILDER TAB -->
             <section id="vocabulary" class="tab-content" role="tabpanel">
-                <div class="tool-card">
-                    <div class="tool-card-header">
-                        <div class="tool-card-title">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
-                            Vocabulary Builder
-                        </div>
                     </div>
                     <div class="input-box-group">
                         <input type="text" id="vocabInput" class="custom-input" placeholder="Enter a German word (e.g. Haus, Hund)...">
@@ -283,6 +264,111 @@
                 </div>
             </section>
 
+            <!-- 9. SETTINGS & VOICE ACCENT CONFIGURATION TAB -->
+            <section id="settings" class="tab-content" role="tabpanel">
+                <div class="card-container">
+                    <h2 style="font-size:20px; font-family:var(--font-heading); margin-bottom:4px;">Settings & Preferences</h2>
+                    <p style="color:var(--text-secondary); font-size:13px; margin-bottom:20px;">Configure target language, African voice accents, and AI parameters.</p>
+
+                    <!-- Section 1: Target Language -->
+                    <div style="margin-bottom:24px;">
+                        <h4 style="font-family:var(--font-heading); font-size:14px; color:var(--text-accent); margin-bottom:10px;">🌐 Target Learning Language</h4>
+                        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+                            <button id="setLangGerman" class="quiz-option-card lang-setting-card active" data-lang="German">
+                                <div style="display:flex; align-items:center; gap:10px;">
+                                    <span style="font-size:24px;">🇩🇪</span>
+                                    <div>
+                                        <strong>German</strong><br>
+                                        <small style="color:var(--text-secondary);">Deutsch Tutor</small>
+                                    </div>
+                                </div>
+                            </button>
+                            <button id="setLangFrench" class="quiz-option-card lang-setting-card" data-lang="French">
+                                <div style="display:flex; align-items:center; gap:10px;">
+                                    <span style="font-size:24px;">🇫🇷</span>
+                                    <div>
+                                        <strong>French</strong><br>
+                                        <small style="color:var(--text-secondary);">Français Tutor</small>
+                                    </div>
+                                </div>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Section 2: AI Voice Accent Configuration (Cameroon Featured) -->
+                    <div style="margin-bottom:24px;">
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                            <h4 style="font-family:var(--font-heading); font-size:14px; color:var(--text-accent);">🎙️ AI Voice Accent & Speech</h4>
+                            <button id="testVoiceBtn" class="audio-btn">🔊 Test Sample Voice</button>
+                        </div>
+
+                        <div style="display:flex; flex-direction:column; gap:10px;">
+                            <button class="quiz-option-card voice-setting-card active" data-accent="fr-CM">
+                                <div style="display:flex; align-items:center; gap:10px;">
+                                    <span style="font-size:24px;">🇨🇲</span>
+                                    <div>
+                                        <strong>African Accent (Cameroon 🇨🇲)</strong><br>
+                                        <small style="color:var(--text-secondary);">Cameroonian African voice accent (fr-CM / en-CM)</small>
+                                    </div>
+                                </div>
+                            </button>
+                            <button class="quiz-option-card voice-setting-card" data-accent="en-NG">
+                                <div style="display:flex; align-items:center; gap:10px;">
+                                    <span style="font-size:24px;">🇳🇬</span>
+                                    <div>
+                                        <strong>African Accent (Nigeria 🇳🇬)</strong><br>
+                                        <small style="color:var(--text-secondary);">African English voice accent (en-NG)</small>
+                                    </div>
+                                </div>
+                            </button>
+                            <button class="quiz-option-card voice-setting-card" data-accent="en-ZA">
+                                <div style="display:flex; align-items:center; gap:10px;">
+                                    <span style="font-size:24px;">🇿🇦</span>
+                                    <div>
+                                        <strong>African Accent (South Africa 🇿🇦)</strong><br>
+                                        <small style="color:var(--text-secondary);">African English voice accent (en-ZA)</small>
+                                    </div>
+                                </div>
+                            </button>
+                            <button class="quiz-option-card voice-setting-card" data-accent="en-KE">
+                                <div style="display:flex; align-items:center; gap:10px;">
+                                    <span style="font-size:24px;">🇰🇪</span>
+                                    <div>
+                                        <strong>African Accent (Kenya 🇰🇪)</strong><br>
+                                        <small style="color:var(--text-secondary);">African English voice accent (en-KE)</small>
+                                    </div>
+                                </div>
+                            </button>
+                            <button class="quiz-option-card voice-setting-card" data-accent="native">
+                                <div style="display:flex; align-items:center; gap:10px;">
+                                    <span style="font-size:24px;">🌐</span>
+                                    <div>
+                                        <strong>Native Target Speaker</strong><br>
+                                        <small style="color:var(--text-secondary);">Native German (de-DE) or French (fr-FR) voice</small>
+                                    </div>
+                                </div>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Section 3: AI Engine Selector -->
+                    <div style="margin-bottom:20px;">
+                        <h4 style="font-family:var(--font-heading); font-size:14px; color:var(--text-accent); margin-bottom:10px;">⚡ AI Model Engine</h4>
+                        <div style="display:flex; flex-direction:column; gap:8px;">
+                            <button class="quiz-option-card model-setting-card active" data-model="auto">
+                                <div><strong>Auto Failover (Gemini 2.5 ➔ Groq Llama 3.3)</strong><br><small style="color:var(--text-secondary);">Sub-200ms responses with automatic failover</small></div>
+                            </button>
+                            <button class="quiz-option-card model-setting-card" data-model="gemini">
+                                <div><strong>Gemini 2.5 Flash</strong><br><small style="color:var(--text-secondary);">Google DeepMind GenAI Engine</small></div>
+                            </button>
+                            <button class="quiz-option-card model-setting-card" data-model="groq">
+                                <div><strong>Groq Llama 3.3 70B</strong><br><small style="color:var(--text-secondary);">Groq Ultra-Fast LPU Engine (140ms)</small></div>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
         </main>
 
         <!-- Fixed Bottom Navigation Bar -->
@@ -314,12 +400,16 @@
         <div id="drawerModal" class="sheet-modal">
             <div class="sheet-handle"></div>
             <div class="sheet-grid">
+                <button class="sheet-item-btn" data-tab="settings">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+                    <span>Settings</span>
+                </button>
                 <button class="sheet-item-btn" data-tab="flashcards">
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--warning)" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 3H8"></path></svg>
                     <span>Flashcards</span>
                 </button>
                 <button class="sheet-item-btn" data-tab="grammar">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg>
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 1 3-3h7z"></path></svg>
                     <span>Grammar</span>
                 </button>
                 <button class="sheet-item-btn" data-tab="quiz">

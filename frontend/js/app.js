@@ -16,7 +16,7 @@ const CONFIG = {
 const state = {
     currentLevel: localStorage.getItem('deutschlern_level') || CONFIG.DEFAULT_LEVEL,
     currentLanguage: localStorage.getItem('lingolern_language') || 'German',
-    voiceAccent: localStorage.getItem('lingolern_voice_accent') || 'en-NG',
+    voiceAccent: localStorage.getItem('lingolern_voice_accent') || 'fr-CM',
     currentTab: 'chat',
     isLoading: false,
     selectedModel: 'auto',
@@ -43,12 +43,6 @@ const ICONS = {
 // ==================== DOM CACHE ====================
 const DOM = {
     // Header & Navigation
-    voiceAccentBtn: document.getElementById('voiceAccentBtn'),
-    currentAccentFlag: document.getElementById('currentAccentFlag'),
-    currentAccentDisplay: document.getElementById('currentAccentDisplay'),
-    langBadgeBtn: document.getElementById('langBadgeBtn'),
-    currentLangFlag: document.getElementById('currentLangFlag'),
-    currentLangDisplay: document.getElementById('currentLangDisplay'),
     levelBadgeBtn: document.getElementById('levelBadgeBtn'),
     currentLevelDisplay: document.getElementById('currentLevelDisplay'),
     navItems: document.querySelectorAll('.nav-item'),
@@ -61,9 +55,6 @@ const DOM = {
     levelOverlay: document.getElementById('levelOverlay'),
     levelModal: document.getElementById('levelModal'),
     levelOptions: document.querySelectorAll('.level-option'),
-    voiceOverlay: document.getElementById('voiceOverlay'),
-    voiceModal: document.getElementById('voiceModal'),
-    voiceAccentOptions: document.querySelectorAll('.voice-accent-option'),
 
     // Global Overlays
     loadingOverlay: document.getElementById('loadingOverlay'),
@@ -97,14 +88,13 @@ const DOM = {
     translateResult: document.getElementById('translateResult'),
 
     // Grammar
-    grammarInput: document.getElementById('grammarInput'),
     grammarTopic: document.getElementById('grammarTopic'),
+    grammarQuestion: document.getElementById('grammarQuestion'),
     grammarBtn: document.getElementById('grammarBtn'),
     grammarResult: document.getElementById('grammarResult'),
 
     // Quiz
     quizTopic: document.getElementById('quizTopic'),
-    quizCount: document.getElementById('quizCount'),
     quizBtn: document.getElementById('quizBtn'),
     quizResult: document.getElementById('quizResult'),
 
@@ -114,28 +104,7 @@ const DOM = {
     correctResult: document.getElementById('correctResult')
 };
 
-// ==================== INITIALIZATION ====================
-document.addEventListener('DOMContentLoaded', () => {
-    updateLevelUI(state.currentLevel);
-    setupEventListeners();
-});
-
-// ==================== UI HELPERS ====================
-function updateLevelUI(level) {
-    state.currentLevel = level;
-    localStorage.setItem('deutschlern_level', level);
-    if (DOM.currentLevelDisplay) {
-        DOM.currentLevelDisplay.textContent = level;
-    }
-}
-
-function showLoading(show = true) {
-    state.isLoading = show;
-    if (DOM.loadingOverlay) {
-        DOM.loadingOverlay.style.display = show ? 'flex' : 'none';
-    }
-}
-
+// ==================== TOAST & NOTIFICATIONS ====================
 function showToast(message, duration = 3000) {
     if (!DOM.toastContainer) return;
     const toast = document.createElement('div');
@@ -164,9 +133,12 @@ function speakText(text) {
     const utterance = new SpeechSynthesisUtterance(cleanText);
     const voices = window.speechSynthesis.getVoices();
     let selectedVoice = null;
-    const accent = state.voiceAccent || 'en-NG';
+    const accent = state.voiceAccent || 'fr-CM';
 
-    if (accent === 'en-NG') {
+    if (accent === 'fr-CM') {
+        selectedVoice = voices.find(v => v.lang.includes('CM') || v.name.toLowerCase().includes('cameroon') || v.lang.includes('NG') || v.name.toLowerCase().includes('africa'));
+        if (selectedVoice) utterance.lang = selectedVoice.lang;
+    } else if (accent === 'en-NG') {
         selectedVoice = voices.find(v => v.lang.includes('NG') || v.name.toLowerCase().includes('nigeria') || v.name.toLowerCase().includes('africa'));
         if (selectedVoice) utterance.lang = 'en-NG';
     } else if (accent === 'en-ZA') {
@@ -189,7 +161,7 @@ function speakText(text) {
     }
 
     utterance.rate = 0.92;
-    utterance.pitch = accent.startsWith('en-') ? 1.05 : 1.0;
+    utterance.pitch = accent !== 'native' ? 1.05 : 1.0;
 
     window.speechSynthesis.speak(utterance);
     showToast(`Playing audio (${accent === 'native' ? state.currentLanguage : 'African Accent'})...`);
@@ -310,30 +282,47 @@ function setupEventListeners() {
         });
     }
 
-    // Voice Events
-    if (DOM.voiceMicBtn) {
-        DOM.voiceMicBtn.addEventListener('click', toggleVoiceRecording);
-    }
-    if (DOM.voiceAutoToggle) {
-        DOM.voiceAutoToggle.addEventListener('click', () => {
-            voiceState.autoSpeak = !voiceState.autoSpeak;
-            if (voiceState.autoSpeak) {
-                DOM.voiceAutoToggle.classList.add('active-voice');
-                DOM.voiceAutoToggle.querySelector('span').textContent = 'Auto-Speak: ON';
-                showToast('Auto Readback enabled');
-            } else {
-                DOM.voiceAutoToggle.classList.remove('active-voice');
-                DOM.voiceAutoToggle.querySelector('span').textContent = 'Auto-Speak: OFF';
-                showToast('Auto Readback disabled');
-            }
-        });
-    }
-    if (DOM.langBadgeBtn) {
-        DOM.langBadgeBtn.addEventListener('click', () => {
-            state.currentLanguage = state.currentLanguage === 'German' ? 'French' : 'German';
+    // Settings Tab - Language Option Handler
+    document.querySelectorAll('.lang-setting-option').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.querySelectorAll('.lang-setting-option').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            state.currentLanguage = btn.dataset.lang;
             localStorage.setItem('lingolern_language', state.currentLanguage);
             updateLanguageUI();
-            showToast(`Language switched to ${state.currentLanguage} ${state.currentLanguage === 'French' ? '🇫🇷' : '🇩🇪'}`);
+            showToast(`Target Language set to ${state.currentLanguage} ${state.currentLanguage === 'French' ? '🇫🇷' : '🇩🇪'}`);
+        });
+    });
+
+    // Settings Tab - Voice Accent Option Handler
+    document.querySelectorAll('.voice-setting-card').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.querySelectorAll('.voice-setting-card').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            state.voiceAccent = btn.dataset.accent;
+            localStorage.setItem('lingolern_voice_accent', state.voiceAccent);
+            showToast(`AI Voice Accent set to ${btn.querySelector('strong').textContent}`);
+        });
+    });
+
+    // Settings Tab - AI Model Engine Option Handler
+    document.querySelectorAll('.model-setting-card').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.querySelectorAll('.model-setting-card').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            state.selectedModel = btn.dataset.model;
+            showToast(`AI Model set to ${btn.querySelector('strong').textContent}`);
+        });
+    });
+
+    // Test Voice Sample Button
+    const testVoiceBtn = document.getElementById('testVoiceBtn');
+    if (testVoiceBtn) {
+        testVoiceBtn.addEventListener('click', () => {
+            const sampleText = state.currentLanguage === 'French'
+                ? "Bonjour! Bienvenue dans l'apprentissage des langues avec un accent africain du Cameroun."
+                : "Hallo! Willkommen beim Sprachenlernen mit afrikanischem Akzent aus Kamerun.";
+            speakText(sampleText);
         });
     }
 
