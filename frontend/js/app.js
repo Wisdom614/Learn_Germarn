@@ -1181,12 +1181,64 @@ document.addEventListener('DOMContentLoaded', () => {
 let deferredPwaPrompt = null;
 
 function initPwaInstaller() {
+    const installPrompt = document.getElementById('installPrompt');
+    const installOverlay = document.getElementById('installOverlay');
+    const installAppBtn = document.getElementById('installAppBtn');
+    const dismissInstallPrompt = document.getElementById('dismissInstallPrompt');
+    const laterInstallBtn = document.getElementById('laterInstallBtn');
+    const iosInstallSteps = document.getElementById('iosInstallSteps');
+    const installPromptText = document.getElementById('installPromptText');
+    const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+    const isIos = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+    const dismissedKey = 'deutschlern_install_prompt_dismissed';
+
+    const hideInstallPrompt = (remember = false) => {
+        if (remember) localStorage.setItem(dismissedKey, 'true');
+        if (installOverlay) installOverlay.hidden = true;
+        if (installPrompt) installPrompt.hidden = true;
+    };
+
+    const showInstallPrompt = () => {
+        if (!installPrompt || !installOverlay || isStandalone || localStorage.getItem(dismissedKey)) return;
+        if (isIos && !deferredPwaPrompt) {
+            installPromptText.textContent = 'Install DeutschLern from Safari for quick access and a full-screen learning experience.';
+            iosInstallSteps.hidden = false;
+            installAppBtn.textContent = 'I understand';
+        }
+        installOverlay.hidden = false;
+        installPrompt.hidden = false;
+        installAppBtn?.focus();
+    };
+
+    if (installAppBtn) {
+        installAppBtn.addEventListener('click', async () => {
+            if (!deferredPwaPrompt) {
+                hideInstallPrompt();
+                return;
+            }
+            deferredPwaPrompt.prompt();
+            const { outcome } = await deferredPwaPrompt.userChoice;
+            deferredPwaPrompt = null;
+            if (outcome !== 'accepted') hideInstallPrompt(true);
+        });
+    }
+    if (dismissInstallPrompt) dismissInstallPrompt.addEventListener('click', () => hideInstallPrompt(true));
+    if (laterInstallBtn) laterInstallBtn.addEventListener('click', () => hideInstallPrompt(true));
+    if (installOverlay) installOverlay.addEventListener('click', () => hideInstallPrompt(true));
+    window.addEventListener('appinstalled', () => {
+        hideInstallPrompt();
+        if (DOM.pwaInstallBtn) DOM.pwaInstallBtn.style.display = 'none';
+        showToast('DeutschLern installed successfully!');
+    });
+    if (isIos) window.setTimeout(showInstallPrompt, 700);
+
     window.addEventListener('beforeinstallprompt', (e) => {
         e.preventDefault();
         deferredPwaPrompt = e;
         if (DOM.pwaInstallBtn) {
             DOM.pwaInstallBtn.style.display = 'flex';
         }
+        showInstallPrompt();
     });
 
     if (DOM.pwaInstallBtn) {

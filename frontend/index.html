@@ -393,6 +393,23 @@
             </div>
         </div>
 
+        <!-- Guided PWA installation prompt -->
+        <div id="installOverlay" class="install-overlay" hidden></div>
+        <section id="installPrompt" class="install-prompt" role="dialog" aria-modal="true" aria-labelledby="installPromptTitle" hidden>
+            <button id="dismissInstallPrompt" class="install-dismiss" type="button" aria-label="Dismiss install prompt">&times;</button>
+            <div class="install-prompt-icon" aria-hidden="true">DL</div>
+            <p class="install-eyebrow">LEARN ANYWHERE</p>
+            <h2 id="installPromptTitle">Install DeutschLern</h2>
+            <p id="installPromptText">Add DeutschLern to your device for a faster, full-screen learning experience.</p>
+            <ol id="iosInstallSteps" class="ios-install-steps" hidden>
+                <li>Tap the <strong>Share</strong> button in Safari.</li>
+                <li>Choose <strong>Add to Home Screen</strong>.</li>
+                <li>Tap <strong>Add</strong> to finish.</li>
+            </ol>
+            <button id="installAppBtn" class="btn-primary" type="button">Install app</button>
+            <button id="laterInstallBtn" class="install-later" type="button">Maybe later</button>
+        </section>
+
         <!-- Global Loading Overlay -->
         <div id="loadingOverlay" class="loading-overlay" style="display:none;" role="status">
             <div class="spinner"></div>

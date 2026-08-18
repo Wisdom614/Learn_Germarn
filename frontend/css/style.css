@@ -1232,3 +1232,97 @@ textarea:focus-visible,
     transition-duration: 0.01ms !important;
   }
 }
+
+/* PWA install guidance */
+.install-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 500;
+  background: rgba(3, 7, 18, 0.72);
+  backdrop-filter: blur(6px);
+}
+
+.install-prompt {
+  position: fixed;
+  z-index: 501;
+  top: 50%;
+  left: 50%;
+  width: min(calc(100% - 32px), 390px);
+  transform: translate(-50%, -50%);
+  padding: 28px;
+  border: 1px solid var(--border-accent);
+  border-radius: var(--radius-xl);
+  background: linear-gradient(145deg, #182235, #0f172a);
+  box-shadow: var(--shadow-lg), var(--shadow-glow);
+  text-align: center;
+}
+
+.install-prompt-icon {
+  width: 54px;
+  height: 54px;
+  margin: 0 auto 14px;
+  display: grid;
+  place-items: center;
+  border-radius: 17px;
+  background: var(--gradient-primary);
+  color: #fff;
+  font-family: var(--font-heading);
+  font-weight: 800;
+  box-shadow: 0 8px 20px rgba(16, 185, 129, 0.28);
+}
+
+.install-eyebrow {
+  margin-bottom: 5px;
+  color: var(--text-accent);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+}
+
+.install-prompt h2 {
+  margin-bottom: 8px;
+  font-family: var(--font-heading);
+  font-size: 22px;
+}
+
+.install-prompt p:not(.install-eyebrow) {
+  margin-bottom: 20px;
+  color: var(--text-secondary);
+  font-size: 14px;
+  line-height: 1.55;
+}
+
+.ios-install-steps {
+  margin: -4px 0 20px;
+  padding-left: 22px;
+  color: var(--text-secondary);
+  text-align: left;
+  font-size: 13px;
+  line-height: 1.8;
+}
+
+.install-dismiss {
+  position: absolute;
+  top: 10px;
+  right: 12px;
+  width: 36px;
+  min-height: 36px;
+  border: 0;
+  background: transparent;
+  color: var(--text-secondary);
+  cursor: pointer;
+  font-size: 27px;
+  line-height: 1;
+}
+
+.install-later {
+  width: 100%;
+  min-height: 38px;
+  margin-top: 8px;
+  border: 0;
+  background: transparent;
+  color: var(--text-secondary);
+  cursor: pointer;
+  font: inherit;
+  font-size: 13px;
+}
