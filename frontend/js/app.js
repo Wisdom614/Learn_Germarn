@@ -8,7 +8,7 @@
 const CONFIG = {
     API_BASE_URL: (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
         ? 'http://localhost:8000'
-        : (window.APP_CONFIG?.API_BASE_URL || '/api'),
+        : (window.APP_CONFIG?.API_BASE_URL || 'https://learn-germarn.missmaster.workers.dev'),
     USER_ID: 'user_' + Math.random().toString(36).substring(2, 11),
     DEFAULT_LEVEL: 'A1'
 };
