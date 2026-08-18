@@ -266,6 +266,7 @@ function setupEventListeners() {
                 showToast('Auto Readback disabled');
             }
         });
+    }
     if (DOM.aiModelToggle) {
         DOM.aiModelToggle.addEventListener('click', () => {
             if (state.selectedModel === 'auto') {
