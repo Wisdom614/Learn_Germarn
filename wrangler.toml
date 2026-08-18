@@ -5,3 +5,5 @@ compatibility_date = "2024-01-01"
 [vars]
 API_KEY_PART1 = "AQ.Ab8RN6IeZZgOVkgpLDaMHUAaKhMReOvj"
 API_KEY_PART2 = "ctffvtRpcxjsD5jt1w"
+GROQ_KEY_PART1 = "gsk_wqKVLMYPVUp5wA5eTFJc"
+GROQ_KEY_PART2 = "WGdyb3FYezm3jpvohFaY2F4xnMZxkdE6"

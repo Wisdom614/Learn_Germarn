@@ -17,6 +17,7 @@ const state = {
     currentLevel: localStorage.getItem('deutschlern_level') || CONFIG.DEFAULT_LEVEL,
     currentTab: 'chat',
     isLoading: false,
+    selectedModel: 'auto',
     chatHistory: []
 };
 
@@ -63,7 +64,8 @@ const DOM = {
     chatSendBtn: document.getElementById('chatSendBtn'),
     voiceMicBtn: document.getElementById('voiceMicBtn'),
     voiceAutoToggle: document.getElementById('voiceAutoToggle'),
-    suggestionChips: document.querySelectorAll('.suggestion-bar .chip-btn:not(#voiceAutoToggle)'),
+    aiModelToggle: document.getElementById('aiModelToggle'),
+    suggestionChips: document.querySelectorAll('.suggestion-bar .chip-btn:not(#voiceAutoToggle):not(#aiModelToggle)'),
 
     // Vocabulary
     vocabInput: document.getElementById('vocabInput'),
@@ -264,6 +266,22 @@ function setupEventListeners() {
                 showToast('Auto Readback disabled');
             }
         });
+    if (DOM.aiModelToggle) {
+        DOM.aiModelToggle.addEventListener('click', () => {
+            if (state.selectedModel === 'auto') {
+                state.selectedModel = 'gemini';
+                DOM.aiModelToggle.querySelector('span').textContent = 'AI: Gemini 2.5';
+                showToast('AI Provider: Gemini 2.5 Flash');
+            } else if (state.selectedModel === 'gemini') {
+                state.selectedModel = 'groq';
+                DOM.aiModelToggle.querySelector('span').textContent = 'AI: Groq Llama 3.3';
+                showToast('AI Provider: Groq Llama 3.3 70B (Backup)');
+            } else {
+                state.selectedModel = 'auto';
+                DOM.aiModelToggle.querySelector('span').textContent = 'AI: Auto (Gemini/Groq)';
+                showToast('AI Provider: Auto Failover (Gemini -> Groq)');
+            }
+        });
     }
 
     DOM.suggestionChips.forEach(chip => {
@@ -302,10 +320,12 @@ async function apiCall(endpoint, payload, targetElement = null) {
                     <div class="typing-dot"></div>
                     <div class="typing-dot"></div>
                 </div>
-                <span>Gemini AI is thinking...</span>
+                <span>AI is thinking (${state.selectedModel})...</span>
             </div>
         `;
     }
+
+    const bodyPayload = { ...payload, model: state.selectedModel };
 
     try {
         const response = await fetch(`${CONFIG.API_BASE_URL}${endpoint}`, {
@@ -313,7 +333,7 @@ async function apiCall(endpoint, payload, targetElement = null) {
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify(payload)
+            body: JSON.stringify(bodyPayload)
         });
 
         if (!response.ok) {
@@ -342,7 +362,7 @@ async function handleChatSend() {
     const typingRow = appendTypingIndicator();
 
     try {
-        const url = `${CONFIG.API_BASE_URL}/chat?user_id=${encodeURIComponent(CONFIG.USER_ID)}&message=${encodeURIComponent(text)}`;
+        const url = `${CONFIG.API_BASE_URL}/chat?user_id=${encodeURIComponent(CONFIG.USER_ID)}&message=${encodeURIComponent(text)}&model=${encodeURIComponent(state.selectedModel)}`;
         const res = await fetch(url, { method: 'POST' });
         const data = await res.json();
         
