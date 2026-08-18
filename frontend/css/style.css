@@ -912,3 +912,59 @@ body::after {
   color: var(--text-secondary);
   font-size: 14px;
 }
+
+/* Enhanced Markdown & Text Formatting */
+.msg-bubble {
+  line-height: 1.6;
+  font-size: 14px;
+}
+
+.msg-subtitle {
+  font-size: 14px;
+  font-weight: 700;
+  color: #A5B4FC;
+  margin: 10px 0 4px 0;
+}
+
+.msg-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: #FFF;
+  margin: 12px 0 6px 0;
+}
+
+.msg-code {
+  background: rgba(255, 255, 255, 0.1);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--warning);
+}
+
+.msg-list {
+  margin: 8px 0;
+  padding-left: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.msg-list li {
+  position: relative;
+  line-height: 1.5;
+}
+
+.translation-block {
+  margin-top: 10px;
+  padding: 8px 12px;
+  background: rgba(255, 255, 255, 0.05);
+  border-left: 3px solid var(--primary);
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+.msg-spacer {
+  height: 8px;
+}

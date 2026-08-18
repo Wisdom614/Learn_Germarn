@@ -409,6 +409,54 @@ function appendTypingIndicator() {
     return row;
 }
 
+function parseMarkdown(text) {
+    if (!text) return '';
+
+    let formatted = text
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;');
+
+    formatted = formatted.replace(/^### (.*$)/gim, '<h5 class="msg-subtitle">$1</h5>');
+    formatted = formatted.replace(/^## (.*$)/gim, '<h4 class="msg-title">$1</h4>');
+    formatted = formatted.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+    formatted = formatted.replace(/\*(.*?)\*/g, '<em>$1</em>');
+    formatted = formatted.replace(/_(.*?)_/g, '<em>$1</em>');
+    formatted = formatted.replace(/`(.*?)`/g, '<code class="msg-code">$1</code>');
+
+    // Format English translation sub-blocks
+    formatted = formatted.replace(/(?:English|\(English\)|Translation):\s*(.*)/gi, '<div class="translation-block"><strong>English:</strong> $1</div>');
+
+    // Bullet points formatting
+    const lines = formatted.split('\n');
+    let inList = false;
+    let result = [];
+
+    for (let i = 0; i < lines.length; i++) {
+        let line = lines[i].trim();
+        if (line.startsWith('- ') || line.startsWith('* ')) {
+            if (!inList) {
+                inList = true;
+                result.push('<ul class="msg-list">');
+            }
+            result.push(`<li>${line.substring(2)}</li>`);
+        } else {
+            if (inList) {
+                inList = false;
+                result.push('</ul>');
+            }
+            result.push(line);
+        }
+    }
+    if (inList) result.push('</ul>');
+
+    formatted = result.join('\n');
+    formatted = formatted.replace(/\n\n/g, '<div class="msg-spacer"></div>');
+    formatted = formatted.replace(/\n/g, '<br>');
+
+    return formatted;
+}
+
 function appendChatMessage(sender, text) {
     const row = document.createElement('div');
     row.className = `msg-row ${sender}`;
@@ -419,7 +467,7 @@ function appendChatMessage(sender, text) {
 
     const bubble = document.createElement('div');
     bubble.className = 'msg-bubble';
-    bubble.innerHTML = text.replace(/\n/g, '<br>');
+    bubble.innerHTML = parseMarkdown(text);
 
     if (sender === 'bot') {
         const actions = document.createElement('div');
