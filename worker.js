@@ -184,10 +184,11 @@ async function callGroq(prompt, apiKey, maxTokens = 1000) {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${apiKey}`
+        'Authorization': `Bearer ${apiKey}`,
+        'User-Agent': 'Mozilla/5.0'
       },
       body: JSON.stringify({
-        model: 'llama-3.3-70b-versatile',
+        model: 'groq/compound',
         messages: [{ role: 'user', content: prompt }],
         max_tokens: maxTokens,
         temperature: 0.7
