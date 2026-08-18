@@ -55,6 +55,15 @@ const DOM = {
     levelOverlay: document.getElementById('levelOverlay'),
     levelModal: document.getElementById('levelModal'),
     levelOptions: document.querySelectorAll('.level-option'),
+    voiceOverlay: document.getElementById('voiceOverlay'),
+    voiceModal: document.getElementById('voiceModal'),
+    voiceAccentBtn: document.getElementById('voiceAccentBtn'),
+    voiceAccentOptions: document.querySelectorAll('.voice-accent-option'),
+    currentAccentFlag: document.getElementById('currentAccentFlag'),
+    currentAccentDisplay: document.getElementById('currentAccentDisplay'),
+    currentLangFlag: document.getElementById('currentLangFlag'),
+    currentLangDisplay: document.getElementById('currentLangDisplay'),
+    pwaInstallBtn: document.getElementById('pwaInstallBtn'),
 
     // Global Overlays
     loadingOverlay: document.getElementById('loadingOverlay'),
@@ -223,6 +232,13 @@ function updateVoiceAccentUI(flag, name) {
     if (DOM.currentAccentDisplay) DOM.currentAccentDisplay.textContent = name || 'African (NG)';
 }
 
+function updateLevelUI(level) {
+    state.currentLevel = level;
+    localStorage.setItem('deutschlern_level', level);
+    if (DOM.currentLevelDisplay) DOM.currentLevelDisplay.textContent = level;
+    DOM.levelOptions.forEach(option => option.classList.toggle('active', option.dataset.level === level));
+}
+
 function setupEventListeners() {
     DOM.navItems.forEach(item => {
         item.addEventListener('click', () => {
@@ -276,6 +292,14 @@ function setupEventListeners() {
     if (DOM.voiceOverlay) DOM.voiceOverlay.addEventListener('click', closeModalSheets);
 
     if (DOM.chatSendBtn) DOM.chatSendBtn.addEventListener('click', handleChatSend);
+    if (DOM.voiceMicBtn) DOM.voiceMicBtn.addEventListener('click', toggleVoiceRecording);
+    if (DOM.voiceAutoToggle) {
+        DOM.voiceAutoToggle.addEventListener('click', () => {
+            voiceState.autoSpeak = !voiceState.autoSpeak;
+            DOM.voiceAutoToggle.classList.toggle('active-voice', voiceState.autoSpeak);
+            DOM.voiceAutoToggle.querySelector('span').textContent = `Auto-Speak: ${voiceState.autoSpeak ? 'ON' : 'OFF'}`;
+        });
+    }
     if (DOM.chatInput) {
         DOM.chatInput.addEventListener('keypress', (e) => {
             if (e.key === 'Enter') handleChatSend();
@@ -283,9 +307,9 @@ function setupEventListeners() {
     }
 
     // Settings Tab - Language Option Handler
-    document.querySelectorAll('.lang-setting-option').forEach(btn => {
+    document.querySelectorAll('.lang-setting-card').forEach(btn => {
         btn.addEventListener('click', () => {
-            document.querySelectorAll('.lang-setting-option').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.lang-setting-card').forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
             state.currentLanguage = btn.dataset.lang;
             localStorage.setItem('lingolern_language', state.currentLanguage);
@@ -700,8 +724,8 @@ async function handleTranslate() {
     try {
         const data = await apiCall('/translate', {
             text,
-            source_lang: DOM.sourceLang.value,
-            target_lang: DOM.targetLang.value
+            source_lang: 'English',
+            target_lang: state.currentLanguage
         }, DOM.translateResult);
         renderTranslate(data);
     } catch (err) {}
@@ -728,7 +752,7 @@ function renderTranslate(data) {
 
 /* 5. Grammar Explainer Handler */
 async function handleGrammar() {
-    const question = DOM.grammarInput.value.trim();
+    const question = DOM.grammarQuestion.value.trim();
     if (!question) {
         showToast('Please enter a grammar question');
         return;
@@ -767,7 +791,7 @@ function renderGrammar(data) {
 /* 6. Interactive Quiz Handler */
 async function handleQuiz() {
     const topic = DOM.quizTopic.value.trim() || 'General German';
-    const count = parseInt(DOM.quizCount.value, 10) || 5;
+    const count = 5;
 
     try {
         const data = await apiCall('/quiz', {
@@ -1133,6 +1157,9 @@ window.removeFlashcard = removeFlashcard;
 
 // Attach Flashcards & PWA initializations on page load
 document.addEventListener('DOMContentLoaded', () => {
+    setupEventListeners();
+    updateLevelUI(state.currentLevel);
+    window.DOM = DOM;
     renderFlashcards();
     const clearBtn = document.getElementById('clearDeckBtn');
     if (clearBtn) clearBtn.addEventListener('click', clearFlashcardDeck);

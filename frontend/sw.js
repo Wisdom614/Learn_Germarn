@@ -2,7 +2,7 @@
  * DeutschLern PWA Service Worker
  * Offline Caching & Instant App Launch
  */
-const CACHE_NAME = 'deutschlern-v1';
+const CACHE_NAME = 'deutschlern-v2';
 const ASSETS_TO_CACHE = [
   '/',
   '/index.html',
