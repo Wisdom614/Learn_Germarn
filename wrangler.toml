@@ -1,0 +1,5 @@
+name = "deutschlern"
+compatibility_date = "2024-01-01"
+pages_build_output_dir = "frontend"
+
+# Set GEMINI_API_KEY environment variable in Cloudflare Pages / Workers Dashboard Settings
