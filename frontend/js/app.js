@@ -1069,6 +1069,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const clearBtn = document.getElementById('clearDeckBtn');
     if (clearBtn) clearBtn.addEventListener('click', clearFlashcardDeck);
     initPwaInstaller();
+    initMobileKeyboardAdjuster();
 });
 
 // ==================== PWA INSTALL & SERVICE WORKER CONTROLLER ====================
@@ -1103,4 +1104,73 @@ function initPwaInstaller() {
             });
         });
     }
+}
+
+// ==================== MOBILE VIRTUAL KEYBOARD ADJUSTER ====================
+function initMobileKeyboardAdjuster() {
+    if (!window.visualViewport) return;
+
+    const bottomNav = document.querySelector('.bottom-nav');
+    const inputDock = document.querySelector('.input-dock');
+    const chatInput = document.getElementById('chatInput');
+    const chatWrapper = document.querySelector('.chat-wrapper');
+
+    const handleViewportResize = () => {
+        const viewportHeight = window.visualViewport.height;
+        const windowHeight = window.innerHeight;
+        const keyboardHeight = windowHeight - viewportHeight;
+
+        if (keyboardHeight > 120) {
+            // Virtual keyboard is OPEN
+            document.body.classList.add('keyboard-open');
+            if (bottomNav) bottomNav.style.transform = 'translateY(120%)';
+            if (inputDock) {
+                inputDock.style.position = 'fixed';
+                inputDock.style.bottom = `${keyboardHeight + 8}px`;
+                inputDock.style.left = '16px';
+                inputDock.style.right = '16px';
+                inputDock.style.zIndex = '999';
+                inputDock.style.maxWidth = '900px';
+                inputDock.style.margin = '0 auto';
+            }
+            if (chatWrapper) {
+                chatWrapper.style.paddingBottom = '70px';
+            }
+            if (chatInput && document.activeElement === chatInput) {
+                setTimeout(() => {
+                    chatInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }, 100);
+            }
+        } else {
+            // Virtual keyboard is CLOSED
+            document.body.classList.remove('keyboard-open');
+            if (bottomNav) bottomNav.style.transform = '';
+            if (inputDock) {
+                inputDock.style.position = '';
+                inputDock.style.bottom = '';
+                inputDock.style.left = '';
+                inputDock.style.right = '';
+                inputDock.style.zIndex = '';
+            }
+            if (chatWrapper) {
+                chatWrapper.style.paddingBottom = '';
+            }
+        }
+    };
+
+    window.visualViewport.addEventListener('resize', handleViewportResize);
+    window.visualViewport.addEventListener('scroll', handleViewportResize);
+
+    const inputs = document.querySelectorAll('input, textarea, select');
+    inputs.forEach(input => {
+        input.addEventListener('focus', () => {
+            setTimeout(handleViewportResize, 200);
+            setTimeout(() => {
+                input.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }, 300);
+        });
+        input.addEventListener('blur', () => {
+            setTimeout(handleViewportResize, 200);
+        });
+    });
 }
