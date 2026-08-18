@@ -25,9 +25,11 @@ export default {
       });
     }
 
-    const apiKey = env.GEMINI_API_KEY || (["AQ.Ab8RN6IeZZgOVkgpLDaMHUAaKhMReOvj", "ctffvtRpcxjsD5jt1w"].join(''));
+    const apiKey = env.GEMINI_API_KEY || (typeof DEFAULT_KEY !== 'undefined' ? DEFAULT_KEY : '');
     if (!apiKey) {
-      return jsonResponse({ error: "GEMINI_API_KEY environment variable is not configured in Cloudflare Worker settings." }, 500);
+      return jsonResponse({ 
+        error: "GEMINI_API_KEY environment variable is not configured. Please add GEMINI_API_KEY under Settings -> Variables in your Cloudflare Worker dashboard." 
+      }, 500);
     }
 
     try {
