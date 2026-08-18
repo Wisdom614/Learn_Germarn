@@ -1,0 +1,27 @@
+# Virtual Environment
+backend/venv/
+venv/
+ENV/
+env/
+
+# Environment Variables & Secrets (GEMINI_API_KEY)
+.env
+backend/.env
+*.env
+
+# Python Cache & Compiled Files
+__pycache__/
+backend/__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.pytest_cache/
+
+# IDE & OS Files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Log Files
+*.log

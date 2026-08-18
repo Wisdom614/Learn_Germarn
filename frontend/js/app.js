@@ -1,0 +1,775 @@
+/**
+ * DeutschLern - Mobile-First German Learning App Logic
+ * Stack: Vanilla ES6+ JS (Fetch API, Web Speech API Speech Recognition & Synthesis, DOM)
+ * Version: 4.0.0 — Direct Voice Chat & Audio Readback Integration
+ */
+
+// ==================== CONFIGURATION & STATE ====================
+const CONFIG = {
+    API_BASE_URL: 'http://localhost:8000',
+    USER_ID: 'user_' + Math.random().toString(36).substring(2, 11),
+    DEFAULT_LEVEL: 'A1'
+};
+
+const state = {
+    currentLevel: localStorage.getItem('deutschlern_level') || CONFIG.DEFAULT_LEVEL,
+    currentTab: 'chat',
+    isLoading: false,
+    chatHistory: []
+};
+
+const voiceState = {
+    isListening: false,
+    autoSpeak: true,
+    recognition: null
+};
+
+// SVG Vector Icon Templates
+const ICONS = {
+    bot: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="8" width="16" height="12" rx="2"></rect><path d="M12 8V4H8"></path></svg>`,
+    user: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>`,
+    audio: `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>`,
+    check: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>`,
+    cross: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>`,
+    bulb: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2"><path d="M9 18h6"></path><path d="M10 22h4"></path><path d="M15.09 14c.18-.98.65-1.74 1.41-2.5A4.65 4.65 0 0 0 18 8 6 6 0 0 0 6 8c0 1.55.59 2.8 1.5 3.5.76.76 1.23 1.52 1.41 2.5"></path></svg>`,
+    chat: `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>`
+};
+
+// ==================== DOM CACHE ====================
+const DOM = {
+    // Header & Navigation
+    levelBadgeBtn: document.getElementById('levelBadgeBtn'),
+    currentLevelDisplay: document.getElementById('currentLevelDisplay'),
+    navItems: document.querySelectorAll('.nav-item'),
+    tabContents: document.querySelectorAll('.tab-content'),
+    
+    // Drawers & Modals
+    moreNavBtn: document.getElementById('moreNavBtn'),
+    drawerOverlay: document.getElementById('drawerOverlay'),
+    drawerModal: document.getElementById('drawerModal'),
+    levelOverlay: document.getElementById('levelOverlay'),
+    levelModal: document.getElementById('levelModal'),
+    levelOptions: document.querySelectorAll('.level-option'),
+
+    // Global Overlays
+    loadingOverlay: document.getElementById('loadingOverlay'),
+    toastContainer: document.getElementById('toastContainer'),
+
+    // Chat & Voice
+    chatMessages: document.getElementById('chatMessages'),
+    chatInput: document.getElementById('chatInput'),
+    chatSendBtn: document.getElementById('chatSendBtn'),
+    voiceMicBtn: document.getElementById('voiceMicBtn'),
+    voiceAutoToggle: document.getElementById('voiceAutoToggle'),
+    suggestionChips: document.querySelectorAll('.suggestion-bar .chip-btn:not(#voiceAutoToggle)'),
+
+    // Vocabulary
+    vocabInput: document.getElementById('vocabInput'),
+    vocabBtn: document.getElementById('vocabBtn'),
+    vocabResult: document.getElementById('vocabResult'),
+
+    // Conversation
+    scenarioSelect: document.getElementById('scenarioSelect'),
+    conversationInput: document.getElementById('conversationInput'),
+    conversationBtn: document.getElementById('conversationBtn'),
+    conversationResult: document.getElementById('conversationResult'),
+
+    // Translate
+    sourceLang: document.getElementById('sourceLang'),
+    targetLang: document.getElementById('targetLang'),
+    translateInput: document.getElementById('translateInput'),
+    translateBtn: document.getElementById('translateBtn'),
+    translateResult: document.getElementById('translateResult'),
+
+    // Grammar
+    grammarInput: document.getElementById('grammarInput'),
+    grammarTopic: document.getElementById('grammarTopic'),
+    grammarBtn: document.getElementById('grammarBtn'),
+    grammarResult: document.getElementById('grammarResult'),
+
+    // Quiz
+    quizTopic: document.getElementById('quizTopic'),
+    quizCount: document.getElementById('quizCount'),
+    quizBtn: document.getElementById('quizBtn'),
+    quizResult: document.getElementById('quizResult'),
+
+    // Writing Correction
+    correctInput: document.getElementById('correctInput'),
+    correctBtn: document.getElementById('correctBtn'),
+    correctResult: document.getElementById('correctResult')
+};
+
+// ==================== INITIALIZATION ====================
+document.addEventListener('DOMContentLoaded', () => {
+    updateLevelUI(state.currentLevel);
+    setupEventListeners();
+});
+
+// ==================== UI HELPERS ====================
+function updateLevelUI(level) {
+    state.currentLevel = level;
+    localStorage.setItem('deutschlern_level', level);
+    if (DOM.currentLevelDisplay) {
+        DOM.currentLevelDisplay.textContent = level;
+    }
+}
+
+function showLoading(show = true) {
+    state.isLoading = show;
+    if (DOM.loadingOverlay) {
+        DOM.loadingOverlay.style.display = show ? 'flex' : 'none';
+    }
+}
+
+function showToast(message, duration = 3000) {
+    if (!DOM.toastContainer) return;
+    const toast = document.createElement('div');
+    toast.className = 'toast';
+    toast.textContent = message;
+    DOM.toastContainer.appendChild(toast);
+    setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateY(-10px)';
+        setTimeout(() => toast.remove(), 300);
+    }, duration);
+}
+
+// ==================== WEB SPEECH API (TEXT-TO-SPEECH) ====================
+function speakGerman(text) {
+    if (!('speechSynthesis' in window)) {
+        showToast('Speech synthesis not supported on this browser');
+        return;
+    }
+
+    window.speechSynthesis.cancel();
+
+    const cleanText = text.replace(/[*_#`]/g, '').trim();
+    if (!cleanText) return;
+
+    const utterance = new SpeechSynthesisUtterance(cleanText);
+    utterance.lang = 'de-DE';
+    utterance.rate = 0.9;
+
+    const voices = window.speechSynthesis.getVoices();
+    const deVoice = voices.find(v => v.lang.startsWith('de'));
+    if (deVoice) {
+        utterance.voice = deVoice;
+    }
+
+    window.speechSynthesis.speak(utterance);
+    showToast('Playing German audio...');
+}
+
+// ==================== NAVIGATION & MODALS ====================
+function switchTab(tabId) {
+    state.currentTab = tabId;
+
+    DOM.navItems.forEach(item => {
+        if (item.dataset.tab === tabId) {
+            item.classList.add('active');
+        } else {
+            item.classList.remove('active');
+        }
+    });
+
+    DOM.tabContents.forEach(content => {
+        if (content.id === tabId) {
+            content.classList.add('active');
+        } else {
+            content.classList.remove('active');
+        }
+    });
+
+    closeModalSheets();
+}
+
+function openDrawer() {
+    if (DOM.drawerOverlay && DOM.drawerModal) {
+        DOM.drawerOverlay.classList.add('active');
+        DOM.drawerModal.classList.add('active');
+    }
+}
+
+function openLevelModal() {
+    if (DOM.levelOverlay && DOM.levelModal) {
+        DOM.levelOverlay.classList.add('active');
+        DOM.levelModal.classList.add('active');
+    }
+}
+
+function closeModalSheets() {
+    [DOM.drawerOverlay, DOM.drawerModal, DOM.levelOverlay, DOM.levelModal].forEach(el => {
+        if (el) el.classList.remove('active');
+    });
+}
+
+function setupEventListeners() {
+    DOM.navItems.forEach(item => {
+        item.addEventListener('click', () => {
+            const action = item.dataset.action;
+            const tab = item.dataset.tab;
+            if (action === 'open-drawer') {
+                openDrawer();
+            } else if (tab) {
+                switchTab(tab);
+            }
+        });
+    });
+
+    document.querySelectorAll('.sheet-item-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const tab = btn.dataset.tab;
+            if (tab) switchTab(tab);
+        });
+    });
+
+    if (DOM.levelBadgeBtn) {
+        DOM.levelBadgeBtn.addEventListener('click', openLevelModal);
+    }
+    DOM.levelOptions.forEach(opt => {
+        opt.addEventListener('click', () => {
+            const level = opt.dataset.level;
+            updateLevelUI(level);
+            closeModalSheets();
+            showToast(`CEFR Level set to ${level}`);
+        });
+    });
+
+    if (DOM.drawerOverlay) DOM.drawerOverlay.addEventListener('click', closeModalSheets);
+    if (DOM.levelOverlay) DOM.levelOverlay.addEventListener('click', closeModalSheets);
+
+    if (DOM.chatSendBtn) DOM.chatSendBtn.addEventListener('click', handleChatSend);
+    if (DOM.chatInput) {
+        DOM.chatInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') handleChatSend();
+        });
+    }
+
+    // Voice Events
+    if (DOM.voiceMicBtn) {
+        DOM.voiceMicBtn.addEventListener('click', toggleVoiceRecording);
+    }
+    if (DOM.voiceAutoToggle) {
+        DOM.voiceAutoToggle.addEventListener('click', () => {
+            voiceState.autoSpeak = !voiceState.autoSpeak;
+            if (voiceState.autoSpeak) {
+                DOM.voiceAutoToggle.classList.add('active-voice');
+                DOM.voiceAutoToggle.querySelector('span').textContent = 'Auto-Speak: ON';
+                showToast('Auto Readback enabled');
+            } else {
+                DOM.voiceAutoToggle.classList.remove('active-voice');
+                DOM.voiceAutoToggle.querySelector('span').textContent = 'Auto-Speak: OFF';
+                showToast('Auto Readback disabled');
+            }
+        });
+    }
+
+    DOM.suggestionChips.forEach(chip => {
+        chip.addEventListener('click', () => {
+            const prompt = chip.dataset.prompt;
+            if (prompt && DOM.chatInput) {
+                DOM.chatInput.value = prompt;
+                handleChatSend();
+            }
+        });
+    });
+
+    if (DOM.vocabBtn) DOM.vocabBtn.addEventListener('click', handleVocabulary);
+    if (DOM.conversationBtn) DOM.conversationBtn.addEventListener('click', handleConversation);
+    if (DOM.translateBtn) DOM.translateBtn.addEventListener('click', handleTranslate);
+    if (DOM.grammarBtn) DOM.grammarBtn.addEventListener('click', handleGrammar);
+    if (DOM.quizBtn) DOM.quizBtn.addEventListener('click', handleQuiz);
+    if (DOM.correctBtn) DOM.correctBtn.addEventListener('click', handleCorrection);
+
+    document.addEventListener('click', (e) => {
+        const audioBtn = e.target.closest('.audio-trigger-btn');
+        if (audioBtn) {
+            const textToSpeak = audioBtn.dataset.text;
+            if (textToSpeak) speakGerman(textToSpeak);
+        }
+    });
+}
+
+// ==================== API FETCH HELPER ====================
+async function apiCall(endpoint, payload) {
+    showLoading(true);
+    try {
+        const response = await fetch(`${CONFIG.API_BASE_URL}${endpoint}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(payload)
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.detail || 'Server error occurred');
+        }
+
+        return await response.json();
+    } catch (err) {
+        console.error(`API Error on ${endpoint}:`, err);
+        showToast(`Error: ${err.message}`);
+        throw err;
+    } finally {
+        showLoading(false);
+    }
+}
+
+// ==================== FEATURE HANDLERS ====================
+
+/* 1. Chat Handler */
+async function handleChatSend() {
+    const text = DOM.chatInput.value.trim();
+    if (!text || state.isLoading) return;
+
+    appendChatMessage('user', text);
+    DOM.chatInput.value = '';
+
+    try {
+        const url = `${CONFIG.API_BASE_URL}/chat?user_id=${encodeURIComponent(CONFIG.USER_ID)}&message=${encodeURIComponent(text)}`;
+        showLoading(true);
+        const res = await fetch(url, { method: 'POST' });
+        const data = await res.json();
+        showLoading(false);
+
+        if (data.response) {
+            appendChatMessage('bot', data.response);
+            if (voiceState.autoSpeak) {
+                speakGerman(data.response);
+            }
+        } else {
+            appendChatMessage('bot', 'Sorry, I had trouble generating a response.');
+        }
+    } catch (err) {
+        showLoading(false);
+        appendChatMessage('bot', 'Connection error. Please make sure backend is running.');
+    }
+}
+
+function appendChatMessage(sender, text) {
+    const row = document.createElement('div');
+    row.className = `msg-row ${sender}`;
+
+    const avatar = document.createElement('div');
+    avatar.className = 'avatar';
+    avatar.innerHTML = sender === 'bot' ? ICONS.bot : ICONS.user;
+
+    const bubble = document.createElement('div');
+    bubble.className = 'msg-bubble';
+    bubble.innerHTML = text.replace(/\n/g, '<br>');
+
+    if (sender === 'bot') {
+        const actions = document.createElement('div');
+        actions.className = 'chat-actions';
+        actions.innerHTML = `
+            <button class="action-icon-btn audio-trigger-btn" data-text="${text.replace(/"/g, '&quot;')}" title="Listen to German">
+                ${ICONS.audio}
+            </button>
+        `;
+        bubble.appendChild(actions);
+    }
+
+    row.appendChild(avatar);
+    row.appendChild(bubble);
+
+    DOM.chatMessages.appendChild(row);
+    DOM.chatMessages.scrollTop = DOM.chatMessages.scrollHeight;
+}
+
+/* 2. Vocabulary Handler */
+async function handleVocabulary() {
+    const word = DOM.vocabInput.value.trim();
+    if (!word) {
+        showToast('Please enter a German word');
+        return;
+    }
+
+    try {
+        const data = await apiCall('/vocabulary', { word, language: 'German' });
+        renderVocabulary(data);
+    } catch (err) {}
+}
+
+function renderVocabulary(data) {
+    if (data.error) {
+        DOM.vocabResult.innerHTML = `<div class="result-card"><p style="color:var(--error);">${data.error}</p></div>`;
+        return;
+    }
+
+    const genderClass = data.gender ? data.gender.toLowerCase() : '';
+    let examplesHTML = '';
+    if (data.examples && Array.isArray(data.examples)) {
+        examplesHTML = data.examples.map(ex => `
+            <div class="example-box">
+                <div class="example-de">${ex.german || ex}</div>
+                ${ex.english ? `<div class="example-en">${ex.english}</div>` : ''}
+            </div>
+        `).join('');
+    }
+
+    DOM.vocabResult.innerHTML = `
+        <div class="result-card">
+            <div class="vocab-header">
+                <div>
+                    <div class="vocab-word-title">${data.word || ''}</div>
+                    <div style="color:var(--text-secondary); font-size:13px;">${data.translation || ''} • <em>${data.part_of_speech || ''}</em></div>
+                </div>
+                ${data.gender ? `<span class="gender-badge ${genderClass}">${data.gender}</span>` : ''}
+            </div>
+            
+            <div class="vocab-detail-row">
+                ${data.pronunciation ? `<div><strong>Pronunciation:</strong> ${data.pronunciation}</div>` : ''}
+                
+                <button class="audio-btn audio-trigger-btn" data-text="${data.word}">
+                    ${ICONS.audio}
+                    <span>Listen Word</span>
+                </button>
+                
+                ${data.memory_tip ? `
+                    <div style="margin-top:10px; background:rgba(99,102,241,0.1); padding:10px; border-radius:8px; font-size:13px; display:flex; gap:8px; align-items:flex-start;">
+                        ${ICONS.bulb}
+                        <div><strong>Memory Tip:</strong> ${data.memory_tip}</div>
+                    </div>
+                ` : ''}
+                
+                <div style="margin-top:12px;">
+                    <strong>Examples:</strong>
+                    ${examplesHTML}
+                </div>
+            </div>
+        </div>
+    `;
+}
+
+/* 3. Conversation Handler */
+async function handleConversation() {
+    const scenario = DOM.scenarioSelect.value;
+    const user_input = DOM.conversationInput.value.trim() || 'Hallo!';
+
+    try {
+        const data = await apiCall('/conversation', {
+            scenario,
+            user_input,
+            level: state.currentLevel
+        });
+        renderConversation(data);
+    } catch (err) {}
+}
+
+function renderConversation(data) {
+    if (data.error) {
+        DOM.conversationResult.innerHTML = `<div class="result-card"><p style="color:var(--error);">${data.error}</p></div>`;
+        return;
+    }
+
+    DOM.conversationResult.innerHTML = `
+        <div class="result-card">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                <strong style="color:var(--primary);">Partner Response:</strong>
+                <button class="audio-btn audio-trigger-btn" data-text="${(data.tutor_response || '').replace(/"/g, '&quot;')}">${ICONS.audio} Listen</button>
+            </div>
+            <div style="font-size:16px; font-weight:600; margin-bottom:6px;">${data.tutor_response || ''}</div>
+            <div style="color:var(--text-secondary); font-size:13px; margin-bottom:14px;">${data.translation || ''}</div>
+
+            ${data.corrections ? `
+                <div style="background:rgba(239,68,68,0.1); padding:10px; border-radius:8px; font-size:13px; margin-bottom:10px;">
+                    <strong>Grammar Feedback:</strong> ${data.corrections}
+                </div>
+            ` : ''}
+
+            ${data.suggested_replies && Array.isArray(data.suggested_replies) ? `
+                <div style="margin-top:10px;">
+                    <strong style="font-size:12px; color:var(--text-muted);">Suggested Next Replies:</strong>
+                    <div style="display:flex; flex-direction:column; gap:6px; margin-top:6px;">
+                        ${data.suggested_replies.map(reply => `
+                            <button class="chip-btn" style="text-align:left; border-radius:8px;" onclick="DOM.conversationInput.value='${reply.replace(/'/g, "\\'")}'; handleConversation();">
+                                ${ICONS.chat} ${reply}
+                            </button>
+                        `).join('')}
+                    </div>
+                </div>
+            ` : ''}
+        </div>
+    `;
+}
+
+/* 4. Context Translate Handler */
+async function handleTranslate() {
+    const text = DOM.translateInput.value.trim();
+    if (!text) {
+        showToast('Please enter text to translate');
+        return;
+    }
+
+    try {
+        const data = await apiCall('/translate', {
+            text,
+            source_lang: DOM.sourceLang.value,
+            target_lang: DOM.targetLang.value
+        });
+        renderTranslate(data);
+    } catch (err) {}
+}
+
+function renderTranslate(data) {
+    if (data.error) {
+        DOM.translateResult.innerHTML = `<div class="result-card"><p style="color:var(--error);">${data.error}</p></div>`;
+        return;
+    }
+
+    DOM.translateResult.innerHTML = `
+        <div class="result-card">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                <strong style="color:var(--primary);">Translation:</strong>
+                <button class="audio-btn audio-trigger-btn" data-text="${(data.translation || '').replace(/"/g, '&quot;')}">${ICONS.audio} Listen</button>
+            </div>
+            <div style="font-size:18px; font-weight:700; margin-bottom:12px;">${data.translation || ''}</div>
+            
+            ${data.grammar_notes ? `<div style="font-size:13px; color:var(--text-secondary); margin-top:8px;">💡 <strong>Notes:</strong> ${data.grammar_notes}</div>` : ''}
+        </div>
+    `;
+}
+
+/* 5. Grammar Explainer Handler */
+async function handleGrammar() {
+    const question = DOM.grammarInput.value.trim();
+    if (!question) {
+        showToast('Please enter a grammar question');
+        return;
+    }
+
+    try {
+        const data = await apiCall('/grammar', {
+            question,
+            topic: DOM.grammarTopic.value.trim() || undefined
+        });
+        renderGrammar(data);
+    } catch (err) {}
+}
+
+function renderGrammar(data) {
+    if (data.error) {
+        DOM.grammarResult.innerHTML = `<div class="result-card"><p style="color:var(--error);">${data.error}</p></div>`;
+        return;
+    }
+
+    let rulesHTML = '';
+    if (data.rules && Array.isArray(data.rules)) {
+        rulesHTML = data.rules.map(r => `<li style="margin-bottom:4px;">${r}</li>`).join('');
+    }
+
+    DOM.grammarResult.innerHTML = `
+        <div class="result-card">
+            <h4 style="font-family:var(--font-heading); margin-bottom:8px;">${data.topic || 'Grammar Explanation'}</h4>
+            <div style="line-height:1.6; margin-bottom:12px;">${data.explanation || ''}</div>
+            
+            ${rulesHTML ? `<div style="background:var(--bg-elevated); padding:12px; border-radius:8px; font-size:13px;"><strong>Key Rules:</strong><ul style="padding-left:18px; margin-top:6px;">${rulesHTML}</ul></div>` : ''}
+        </div>
+    `;
+}
+
+/* 6. Interactive Quiz Handler */
+async function handleQuiz() {
+    const topic = DOM.quizTopic.value.trim() || 'General German';
+    const count = parseInt(DOM.quizCount.value, 10) || 5;
+
+    try {
+        const data = await apiCall('/quiz', {
+            topic,
+            count,
+            level: state.currentLevel
+        });
+        renderQuiz(data);
+    } catch (err) {}
+}
+
+function renderQuiz(data) {
+    if (data.error || !data.questions || !Array.isArray(data.questions)) {
+        DOM.quizResult.innerHTML = `<div class="result-card"><p style="color:var(--error);">${data.error || 'Could not load quiz questions'}</p></div>`;
+        return;
+    }
+
+    const questions = data.questions;
+
+    function renderQuestion(idx) {
+        const q = questions[idx];
+        const optionsHTML = q.options.map((opt, oIdx) => `
+            <div class="quiz-option-card" data-idx="${oIdx}" onclick="checkAnswer(${idx}, '${opt.replace(/'/g, "\\'")}', this)">
+                <span>${opt}</span>
+            </div>
+        `).join('');
+
+        DOM.quizResult.innerHTML = `
+            <div class="result-card">
+                <div style="display:flex; justify-content:space-between; margin-bottom:12px; font-size:12px; color:var(--text-secondary);">
+                    <span>Question ${idx + 1} of ${questions.length}</span>
+                    <span class="level-chip">${q.difficulty || state.currentLevel}</span>
+                </div>
+                
+                <h4 style="font-size:16px; font-family:var(--font-heading); margin-bottom:14px;">${q.question}</h4>
+                
+                <div class="quiz-options-list">
+                    ${optionsHTML}
+                </div>
+                
+                <div id="quizFeedback" style="margin-top:14px; display:none;"></div>
+            </div>
+        `;
+    }
+
+    window.checkAnswer = function(qIdx, selectedOpt, el) {
+        const q = questions[qIdx];
+        const isCorrect = (selectedOpt.trim().toLowerCase() === (q.correct_answer || '').trim().toLowerCase());
+        
+        document.querySelectorAll('.quiz-option-card').forEach(card => card.style.pointerEvents = 'none');
+        
+        if (isCorrect) {
+            el.classList.add('correct');
+        } else {
+            el.classList.add('incorrect');
+        }
+
+        const feedback = document.getElementById('quizFeedback');
+        feedback.style.display = 'block';
+        feedback.innerHTML = `
+            <div style="background:${isCorrect ? 'var(--success-light)' : 'var(--error-light)'}; border:1px solid ${isCorrect ? 'var(--success)' : 'var(--error)'}; padding:12px; border-radius:8px; font-size:13px;">
+                <div style="display:flex; align-items:center; gap:6px; font-weight:700; color:${isCorrect ? 'var(--success)' : 'var(--error)'};">
+                    ${isCorrect ? ICONS.check + ' Correct (Richtig!)' : ICONS.cross + ' Incorrect (Falsch!)'}
+                </div>
+                ${!isCorrect ? `<div style="margin-top:4px;">Correct Answer: <strong>${q.correct_answer}</strong></div>` : ''}
+                ${q.explanation ? `<small style="display:block; margin-top:4px;">${q.explanation}</small>` : ''}
+            </div>
+            ${qIdx < questions.length - 1 ? `
+                <button class="btn-primary" style="margin-top:12px;" onclick="renderNextQuestion(${qIdx + 1})">Next Question ➔</button>
+            ` : `
+                <div style="text-align:center; margin-top:14px; font-weight:700; color:var(--success);">Quiz Completed! Excellent work!</div>
+            `}
+        `;
+    };
+
+    window.renderNextQuestion = function(nextIdx) {
+        renderQuestion(nextIdx);
+    };
+
+    renderQuestion(0);
+}
+
+/* 7. Writing Correction Handler */
+async function handleCorrection() {
+    const text = DOM.correctInput.value.trim();
+    if (!text) {
+        showToast('Please enter German text to correct');
+        return;
+    }
+
+    try {
+        const data = await apiCall('/correct', {
+            text,
+            level: state.currentLevel
+        });
+        renderCorrection(data, text);
+    } catch (err) {}
+}
+
+function renderCorrection(data, originalText) {
+    if (data.error) {
+        DOM.correctResult.innerHTML = `<div class="result-card"><p style="color:var(--error);">${data.error}</p></div>`;
+        return;
+    }
+
+    DOM.correctResult.innerHTML = `
+        <div class="result-card">
+            <h4 style="font-family:var(--font-heading); margin-bottom:12px;">Writing Correction Results</h4>
+            
+            <div class="diff-container">
+                <div class="diff-box original">
+                    <strong style="color:var(--error);">Your Text:</strong><br>
+                    ${originalText}
+                </div>
+                <div class="diff-box corrected">
+                    <strong style="color:var(--success);">Corrected German:</strong>
+                    <button class="audio-btn audio-trigger-btn" style="float:right;" data-text="${(data.corrected_text || '').replace(/"/g, '&quot;')}">${ICONS.audio} Listen</button><br>
+                    ${data.corrected_text || ''}
+                </div>
+            </div>
+
+            ${data.feedback ? `<div style="margin-top:14px; background:rgba(99,102,241,0.1); padding:10px; border-radius:8px; font-size:13px;">Feedback: ${data.feedback}</div>` : ''}
+        </div>
+    `;
+}
+
+// ==================== VOICE RECOGNITION CONTROLLER ====================
+function initSpeechRecognition() {
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SpeechRecognition) {
+        return null;
+    }
+
+    const recognition = new SpeechRecognition();
+    recognition.lang = 'de-DE';
+    recognition.interimResults = true;
+    recognition.continuous = false;
+
+    recognition.onstart = () => {
+        voiceState.isListening = true;
+        if (DOM.voiceMicBtn) {
+            DOM.voiceMicBtn.classList.add('listening');
+        }
+        showToast('🎙️ Listening... Speak now in German!');
+    };
+
+    recognition.onresult = (event) => {
+        let transcript = '';
+        for (let i = event.resultIndex; i < event.results.length; i++) {
+            transcript += event.results[i][0].transcript;
+        }
+        if (DOM.chatInput) {
+            DOM.chatInput.value = transcript;
+        }
+    };
+
+    recognition.onerror = (event) => {
+        console.error('Speech recognition error:', event.error);
+        voiceState.isListening = false;
+        if (DOM.voiceMicBtn) DOM.voiceMicBtn.classList.remove('listening');
+        showToast(`Voice Error: ${event.error}`);
+    };
+
+    recognition.onend = () => {
+        voiceState.isListening = false;
+        if (DOM.voiceMicBtn) {
+            DOM.voiceMicBtn.classList.remove('listening');
+        }
+        
+        const text = DOM.chatInput ? DOM.chatInput.value.trim() : '';
+        if (text) {
+            showToast('Sending speech to German Tutor...');
+            handleChatSend();
+        }
+    };
+
+    return recognition;
+}
+
+function toggleVoiceRecording() {
+    if (!voiceState.recognition) {
+        voiceState.recognition = initSpeechRecognition();
+    }
+    if (!voiceState.recognition) {
+        showToast('Speech recognition not supported in this browser. Try Chrome/Edge.');
+        return;
+    }
+
+    if (voiceState.isListening) {
+        voiceState.recognition.stop();
+    } else {
+        try {
+            if (DOM.chatInput) DOM.chatInput.value = '';
+            voiceState.recognition.start();
+        } catch (e) {
+            console.error(e);
+        }
+    }
+}

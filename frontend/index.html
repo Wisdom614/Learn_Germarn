@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>DeutschLern — AI German Language Tutor</title>
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/style.css">
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="app-container">
+        
+        <!-- Header Bar -->
+        <header class="app-header">
+            <div class="brand-section">
+                <div class="brand-logo">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <line x1="2" y1="12" x2="22" y2="12"></line>
+                        <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+                    </svg>
+                </div>
+                <div class="brand-title">DeutschLern</div>
+            </div>
+            
+            <div class="header-actions">
+                <button id="levelBadgeBtn" class="level-badge-btn" title="Select CEFR Level">
+                    <span>Level</span>
+                    <span id="currentLevelDisplay" class="level-chip">A1</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- Toast Notifications Container -->
+        <div id="toastContainer" class="toast-container"></div>
+
+        <!-- Main Content Viewport -->
+        <main class="main-content">
+            
+            <!-- 1. CHAT TAB -->
+            <section id="chat" class="tab-content active" role="tabpanel">
+                <div class="chat-wrapper">
+                    <div id="chatMessages" class="chat-messages">
+                        <div class="msg-row bot">
+                            <div class="avatar">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <rect x="4" y="8" width="16" height="12" rx="2"></rect>
+                                    <path d="M12 8V4H8"></path>
+                                    <line x1="9" y1="13" x2="9.01" y2="13"></line>
+                                    <line x1="15" y1="13" x2="15.01" y2="13"></line>
+                                </svg>
+                            </div>
+                            <div class="msg-bubble">
+                                Hallo! Ich bin dein Deutsch-Tutor. Wie kann ich dir heute helfen?
+                                <small>Hello! I'm your German tutor. How can I help you today?</small>
+                                <div class="chat-actions">
+                                    <button class="action-icon-btn audio-trigger-btn" data-text="Hallo! Ich bin dein Deutsch-Tutor. Wie kann ich dir heute helfen?" title="Listen">
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Quick Suggestions -->
+                    <div class="suggestion-bar">
+                        <button id="voiceAutoToggle" class="chip-btn active-voice" title="Toggle Auto Readback">
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: -2px; margin-right: 4px;"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14"></path></svg>
+                            <span>Auto-Speak: ON</span>
+                        </button>
+                        <button class="chip-btn" data-prompt="Teach me 5 greetings in German">
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: -2px; margin-right: 4px;"><path d="M18 11V6a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v0"></path><path d="M14 10V4a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v6"></path><path d="M10 10.5V6a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v8"></path><path d="M18 8a2 2 0 0 1 2 2v4a6 6 0 0 1-6 6h-2a6 6 0 0 1-6-6v-3a2 2 0 0 1 2-2v0a2 2 0 0 1 2 2v2"></path></svg>
+                            Greetings
+                        </button>
+                        <button class="chip-btn" data-prompt="How do I order coffee in German?">
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: -2px; margin-right: 4px;"><path d="M18 8h1a4 4 0 0 1 0 8h-1"></path><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"></path><line x1="6" y1="1" x2="6" y2="4"></line><line x1="10" y1="1" x2="10" y2="4"></line><line x1="14" y1="1" x2="14" y2="4"></line></svg>
+                            Order Coffee
+                        </button>
+                        <button class="chip-btn" data-prompt="Explain the difference between der, die, and das">
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: -2px; margin-right: 4px;"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
+                            Articles (der/die/das)
+                        </button>
+                        <button class="chip-btn" data-prompt="Practice a short dialogue about shopping">
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: -2px; margin-right: 4px;"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path><line x1="3" y1="6" x2="21" y2="6"></line><path d="M16 10a4 4 0 0 1-8 0"></path></svg>
+                            Shopping Practice
+                        </button>
+                    </div>
+
+                    <!-- Chat Input Dock -->
+                    <div class="input-dock">
+                        <button id="voiceMicBtn" class="mic-btn" title="Speak in German (Voice Mode)" aria-label="Voice input">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
+                                <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+                                <line x1="12" y1="19" x2="12" y2="23"></line>
+                                <line x1="8" y1="23" x2="16" y2="23"></line>
+                            </svg>
+                        </button>
+                        <input type="text" id="chatInput" class="dock-input" placeholder="Ask a question or speak in German..." aria-label="Chat input">
+                        <button id="chatSendBtn" class="send-btn" aria-label="Send message">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 2. VOCABULARY TAB -->
+            <section id="vocabulary" class="tab-content" role="tabpanel">
+                <div class="tool-card">
+                    <div class="tool-card-header">
+                        <div class="tool-card-title">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
+                            Vocabulary Builder
+                        </div>
+                    </div>
+                    <div class="input-box-group">
+                        <input type="text" id="vocabInput" class="custom-input" placeholder="Enter a German word (e.g. Haus, Hund)...">
+                        <button id="vocabBtn" class="btn-primary">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                            <span>Explore Word</span>
+                        </button>
+                    </div>
+                    <div id="vocabResult"></div>
+                </div>
+            </section>
+
+            <!-- 3. CONVERSATION TAB -->
+            <section id="conversation" class="tab-content" role="tabpanel">
+                <div class="tool-card">
+                    <div class="tool-card-header">
+                        <div class="tool-card-title">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg>
+                            Conversation Practice
+                        </div>
+                    </div>
+                    <div class="input-box-group">
+                        <select id="scenarioSelect" class="custom-select">
+                            <option value="restaurant">At a Restaurant (Im Restaurant)</option>
+                            <option value="shopping">Shopping (Beim Einkaufen)</option>
+                            <option value="travel">Travel & Directions (Reise & Wegbeschreibung)</option>
+                            <option value="work">At Work (Am Arbeitsplatz)</option>
+                            <option value="family">Family & Friends (Familie & Freunde)</option>
+                            <option value="hobby">Hobbies & Free Time (Freizeit & Hobbys)</option>
+                        </select>
+                        <input type="text" id="conversationInput" class="custom-input" placeholder="Say something in German to practice...">
+                        <button id="conversationBtn" class="btn-primary">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+                            <span>Practice Dialogue</span>
+                        </button>
+                    </div>
+                    <div id="conversationResult"></div>
+                </div>
+            </section>
+
+            <!-- 4. TRANSLATE TAB -->
+            <section id="translate" class="tab-content" role="tabpanel">
+                <div class="tool-card">
+                    <div class="tool-card-header">
+                        <div class="tool-card-title">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+                            Context Translator
+                        </div>
+                    </div>
+                    <div class="input-box-group">
+                        <div style="display: flex; gap: 8px;">
+                            <select id="sourceLang" class="custom-select" style="flex:1;">
+                                <option value="German">German</option>
+                                <option value="English">English</option>
+                            </select>
+                            <select id="targetLang" class="custom-select" style="flex:1;">
+                                <option value="English">English</option>
+                                <option value="German">German</option>
+                            </select>
+                        </div>
+                        <textarea id="translateInput" class="custom-textarea" rows="3" placeholder="Enter text to translate with context..."></textarea>
+                        <button id="translateBtn" class="btn-primary">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="16 3 21 3 21 8"></polyline><line x1="4" y1="20" x2="21" y2="3"></line><polyline points="8 21 3 21 3 16"></polyline></svg>
+                            <span>Translate Text</span>
+                        </button>
+                    </div>
+                    <div id="translateResult"></div>
+                </div>
+            </section>
+
+            <!-- 5. GRAMMAR TAB -->
+            <section id="grammar" class="tab-content" role="tabpanel">
+                <div class="tool-card">
+                    <div class="tool-card-header">
+                        <div class="tool-card-title">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg>
+                            Grammar Explainer
+                        </div>
+                    </div>
+                    <div class="input-box-group">
+                        <input type="text" id="grammarInput" class="custom-input" placeholder="Ask a grammar question (e.g. When to use Akkusativ?)...">
+                        <input type="text" id="grammarTopic" class="custom-input" placeholder="Topic focus (e.g. Cases, Prepositions) [Optional]">
+                        <button id="grammarBtn" class="btn-primary">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+                            <span>Explain Grammar</span>
+                        </button>
+                    </div>
+                    <div id="grammarResult"></div>
+                </div>
+            </section>
+
+            <!-- 6. QUIZ TAB -->
+            <section id="quiz" class="tab-content" role="tabpanel">
+                <div class="tool-card">
+                    <div class="tool-card-header">
+                        <div class="tool-card-title">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+                            Interactive Quiz Generator
+                        </div>
+                    </div>
+                    <div class="input-box-group">
+                        <input type="text" id="quizTopic" class="custom-input" placeholder="Quiz topic (e.g. Food, Modal Verbs, Articles)...">
+                        <select id="quizCount" class="custom-select">
+                            <option value="3">3 Questions (Quick Practice)</option>
+                            <option value="5" selected>5 Questions (Standard)</option>
+                            <option value="10">10 Questions (Full Test)</option>
+                        </select>
+                        <button id="quizBtn" class="btn-primary">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+                            <span>Generate Quiz</span>
+                        </button>
+                    </div>
+                    <div id="quizResult"></div>
+                </div>
+            </section>
+
+            <!-- 7. WRITING CORRECTION TAB -->
+            <section id="correct" class="tab-content" role="tabpanel">
+                <div class="tool-card">
+                    <div class="tool-card-header">
+                        <div class="tool-card-title">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
+                            German Writing Corrector
+                        </div>
+                    </div>
+                    <div class="input-box-group">
+                        <textarea id="correctInput" class="custom-textarea" rows="4" placeholder="Write your paragraph in German to get detailed feedback..."></textarea>
+                        <button id="correctBtn" class="btn-primary">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                            <span>Check & Improve</span>
+                        </button>
+                    </div>
+                    <div id="correctResult"></div>
+                </div>
+            </section>
+
+        </main>
+
+        <!-- Fixed Bottom Navigation Bar -->
+        <nav class="bottom-nav">
+            <button class="nav-item active" data-tab="chat">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+                <span>Chat</span>
+            </button>
+            <button class="nav-item" data-tab="vocabulary">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
+                <span>Vocab</span>
+            </button>
+            <button class="nav-item" data-tab="conversation">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg>
+                <span>Practice</span>
+            </button>
+            <button class="nav-item" data-tab="translate">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+                <span>Translate</span>
+            </button>
+            <button id="moreNavBtn" class="nav-item" data-action="open-drawer">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+                <span>More</span>
+            </button>
+        </nav>
+
+        <!-- Bottom Sheet Overflow Drawer (More Tools) -->
+        <div id="drawerOverlay" class="sheet-overlay"></div>
+        <div id="drawerModal" class="sheet-modal">
+            <div class="sheet-handle"></div>
+            <div class="sheet-grid">
+                <button class="sheet-item-btn" data-tab="grammar">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg>
+                    <span>Grammar</span>
+                </button>
+                <button class="sheet-item-btn" data-tab="quiz">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--warning)" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+                    <span>Quiz</span>
+                </button>
+                <button class="sheet-item-btn" data-tab="correct">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--success)" stroke-width="2"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
+                    <span>Writing</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Level Selector Sheet Modal -->
+        <div id="levelOverlay" class="sheet-overlay"></div>
+        <div id="levelModal" class="sheet-modal">
+            <div class="sheet-handle"></div>
+            <h3 style="text-align: center; margin-bottom: 16px; font-family: var(--font-heading);">Select Your CEFR Level</h3>
+            <div style="display: flex; flex-direction: column; gap: 10px;">
+                <button class="quiz-option-card level-option" data-level="A1">
+                    <div><strong>A1 — Beginner</strong><br><small style="color:var(--text-secondary);">Basic words & everyday phrases</small></div>
+                </button>
+                <button class="quiz-option-card level-option" data-level="A2">
+                    <div><strong>A2 — Elementary</strong><br><small style="color:var(--text-secondary);">Routine conversations & expressions</small></div>
+                </button>
+                <button class="quiz-option-card level-option" data-level="B1">
+                    <div><strong>B1 — Intermediate</strong><br><small style="color:var(--text-secondary);">Travel, work & personal opinions</small></div>
+                </button>
+                <button class="quiz-option-card level-option" data-level="B2">
+                    <div><strong>B2 — Upper Intermediate</strong><br><small style="color:var(--text-secondary);">Complex text & spontaneous speech</small></div>
+                </button>
+                <button class="quiz-option-card level-option" data-level="C1">
+                    <div><strong>C1 — Advanced</strong><br><small style="color:var(--text-secondary);">Fluent, flexible & academic usage</small></div>
+                </button>
+            </div>
+        </div>
+
+        <!-- Global Loading Overlay -->
+        <div id="loadingOverlay" class="loading-overlay" style="display:none;" role="status">
+            <div class="spinner"></div>
+            <p style="font-family: var(--font-heading); font-weight: 600;">Gemini AI is crafting your response...</p>
+        </div>
+
+    </div>
+
+    <!-- Main JavaScript App -->
+    <script src="js/app.js"></script>
+</body>
+</html>
