@@ -161,9 +161,13 @@ async function callGemini(prompt, apiKey, maxTokens = 1000) {
     }
 
     const data = await response.json();
+    if (data.error) {
+      return `[Gemini Error ${data.error.code || 429}] ${data.error.message || ''}`;
+    }
+
     const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
     if (!text) {
-      return "Hallo! Ich bin dein Deutsch-Tutor. Wie kann ich dir heute helfen?";
+      return `[Gemini Error No Candidate]`;
     }
     return text;
   } catch (e) {
