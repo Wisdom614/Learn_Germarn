@@ -15,6 +15,7 @@ const CONFIG = {
 
 const state = {
     currentLevel: localStorage.getItem('deutschlern_level') || CONFIG.DEFAULT_LEVEL,
+    currentLanguage: localStorage.getItem('lingolern_language') || 'German',
     currentTab: 'chat',
     isLoading: false,
     selectedModel: 'auto',
@@ -41,6 +42,9 @@ const ICONS = {
 // ==================== DOM CACHE ====================
 const DOM = {
     // Header & Navigation
+    langBadgeBtn: document.getElementById('langBadgeBtn'),
+    currentLangFlag: document.getElementById('currentLangFlag'),
+    currentLangDisplay: document.getElementById('currentLangDisplay'),
     levelBadgeBtn: document.getElementById('levelBadgeBtn'),
     currentLevelDisplay: document.getElementById('currentLevelDisplay'),
     navItems: document.querySelectorAll('.nav-item'),
@@ -139,7 +143,7 @@ function showToast(message, duration = 3000) {
 }
 
 // ==================== WEB SPEECH API (TEXT-TO-SPEECH) ====================
-function speakGerman(text) {
+function speakText(text) {
     if (!('speechSynthesis' in window)) {
         showToast('Speech synthesis not supported on this browser');
         return;
@@ -151,18 +155,21 @@ function speakGerman(text) {
     if (!cleanText) return;
 
     const utterance = new SpeechSynthesisUtterance(cleanText);
-    utterance.lang = 'de-DE';
+    const targetLangCode = state.currentLanguage === 'French' ? 'fr-FR' : 'de-DE';
+    utterance.lang = targetLangCode;
     utterance.rate = 0.9;
 
     const voices = window.speechSynthesis.getVoices();
-    const deVoice = voices.find(v => v.lang.startsWith('de'));
-    if (deVoice) {
-        utterance.voice = deVoice;
+    const langPrefix = state.currentLanguage === 'French' ? 'fr' : 'de';
+    const targetVoice = voices.find(v => v.lang.startsWith(langPrefix));
+    if (targetVoice) {
+        utterance.voice = targetVoice;
     }
 
     window.speechSynthesis.speak(utterance);
-    showToast('Playing German audio...');
+    showToast(`Playing ${state.currentLanguage} audio...`);
 }
+const speakGerman = speakText;
 
 // ==================== NAVIGATION & MODALS ====================
 function switchTab(tabId) {
@@ -267,6 +274,15 @@ function setupEventListeners() {
             }
         });
     }
+    if (DOM.langBadgeBtn) {
+        DOM.langBadgeBtn.addEventListener('click', () => {
+            state.currentLanguage = state.currentLanguage === 'German' ? 'French' : 'German';
+            localStorage.setItem('lingolern_language', state.currentLanguage);
+            updateLanguageUI();
+            showToast(`Language switched to ${state.currentLanguage} ${state.currentLanguage === 'French' ? '🇫🇷' : '🇩🇪'}`);
+        });
+    }
+
     if (DOM.aiModelToggle) {
         DOM.aiModelToggle.addEventListener('click', () => {
             if (state.selectedModel === 'auto') {
@@ -306,7 +322,7 @@ function setupEventListeners() {
         const audioBtn = e.target.closest('.audio-trigger-btn');
         if (audioBtn) {
             const textToSpeak = audioBtn.dataset.text;
-            if (textToSpeak) speakGerman(textToSpeak);
+            if (textToSpeak) speakText(textToSpeak);
         }
 
         const flashcardBtn = e.target.closest('.save-flashcard-btn');
@@ -315,6 +331,15 @@ function setupEventListeners() {
             saveToFlashcards(word, translation, gender, pronunciation, example);
         }
     });
+
+    updateLanguageUI();
+}
+
+function updateLanguageUI() {
+    const isFrench = state.currentLanguage === 'French';
+    if (DOM.currentLangFlag) DOM.currentLangFlag.textContent = isFrench ? '🇫🇷' : '🇩🇪';
+    if (DOM.currentLangDisplay) DOM.currentLangDisplay.textContent = isFrench ? 'French' : 'German';
+    if (DOM.chatInput) DOM.chatInput.placeholder = isFrench ? 'Posez une question ou parlez en français...' : 'Ask a question or speak in German...';
 }
 
 // ==================== API FETCH HELPER ====================
@@ -332,7 +357,7 @@ async function apiCall(endpoint, payload, targetElement = null) {
         `;
     }
 
-    const bodyPayload = { ...payload, model: state.selectedModel };
+    const bodyPayload = { ...payload, model: state.selectedModel, language: state.currentLanguage };
 
     try {
         const response = await fetch(`${CONFIG.API_BASE_URL}${endpoint}`, {
@@ -369,7 +394,7 @@ async function handleChatSend() {
     const typingRow = appendTypingIndicator();
 
     try {
-        const url = `${CONFIG.API_BASE_URL}/chat?user_id=${encodeURIComponent(CONFIG.USER_ID)}&message=${encodeURIComponent(text)}&model=${encodeURIComponent(state.selectedModel)}`;
+        const url = `${CONFIG.API_BASE_URL}/chat?user_id=${encodeURIComponent(CONFIG.USER_ID)}&message=${encodeURIComponent(text)}&model=${encodeURIComponent(state.selectedModel)}&language=${encodeURIComponent(state.currentLanguage)}`;
         const res = await fetch(url, { method: 'POST' });
         const data = await res.json();
         
@@ -834,7 +859,7 @@ function initSpeechRecognition() {
     }
 
     const recognition = new SpeechRecognition();
-    recognition.lang = 'de-DE';
+    recognition.lang = state.currentLanguage === 'French' ? 'fr-FR' : 'de-DE';
     recognition.interimResults = true;
     recognition.continuous = false;
 
@@ -843,7 +868,7 @@ function initSpeechRecognition() {
         if (DOM.voiceMicBtn) {
             DOM.voiceMicBtn.classList.add('listening');
         }
-        showToast('🎙️ Listening... Speak now in German!');
+        showToast(`🎙️ Listening... Speak now in ${state.currentLanguage}!`);
     };
 
     recognition.onresult = (event) => {

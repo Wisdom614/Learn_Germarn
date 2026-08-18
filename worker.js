@@ -38,45 +38,46 @@ export default {
       }
 
       const modelChoice = payload.model || url.searchParams.get('model') || 'auto';
+      const targetLang = payload.language || url.searchParams.get('language') || 'German';
 
       if (path === '/vocabulary') {
-        const word = payload.word || 'Haus';
-        const prompt = `You are a German tutor. For the word "${word}" in German, return JSON with keys: word, translation, part_of_speech, gender (der/die/das), pronunciation, examples (array of objects with german and english keys), memory_tip. Return ONLY valid JSON, no markdown formatting.`;
+        const word = payload.word || (targetLang === 'French' ? 'Maison' : 'Haus');
+        const prompt = `You are a ${targetLang} tutor. For the word "${word}" in ${targetLang}, return JSON with keys: word, translation, part_of_speech, gender (der/die/das for German, le/la for French), pronunciation, examples (array of objects with german/target and english keys), memory_tip. Return ONLY valid JSON, no markdown formatting.`;
         const aiRes = await callAI(prompt, env, 1000, modelChoice);
         return jsonResponse(cleanJson(aiRes));
       }
 
       if (path === '/grammar') {
         const question = payload.question || '';
-        const topic = payload.topic || 'German Grammar';
-        const prompt = `You are a German tutor. Explain this grammar question: "${question}" (Topic: ${topic}). Return JSON with keys: topic, explanation, rules (array of strings). Return ONLY valid JSON, no markdown formatting.`;
+        const topic = payload.topic || `${targetLang} Grammar`;
+        const prompt = `You are a ${targetLang} tutor. Explain this grammar question: "${question}" (Topic: ${topic} in ${targetLang}). Return JSON with keys: topic, explanation, rules (array of strings). Return ONLY valid JSON, no markdown formatting.`;
         const aiRes = await callAI(prompt, env, 1000, modelChoice);
         return jsonResponse(cleanJson(aiRes));
       }
 
       if (path === '/conversation') {
         const scenario = payload.scenario || 'restaurant';
-        const userInput = payload.user_input || 'Hallo!';
+        const userInput = payload.user_input || (targetLang === 'French' ? 'Bonjour!' : 'Hallo!');
         const level = payload.level || 'A1';
-        const prompt = `You are a German tutor at ${level} level in a ${scenario} scenario. Student said: "${userInput}". Return JSON with keys: tutor_response, translation, corrections, suggested_replies (array of 3 short German strings). Return ONLY valid JSON, no markdown formatting.`;
+        const prompt = `You are a ${targetLang} tutor at ${level} level in a ${scenario} scenario. Student said: "${userInput}". Return JSON with keys: tutor_response, translation, corrections, suggested_replies (array of 3 short ${targetLang} strings). Return ONLY valid JSON, no markdown formatting.`;
         const aiRes = await callAI(prompt, env, 1000, modelChoice);
         return jsonResponse(cleanJson(aiRes));
       }
 
       if (path === '/translate') {
         const text = payload.text || '';
-        const sourceLang = payload.source_lang || 'German';
-        const targetLang = payload.target_lang || 'English';
-        const prompt = `Translate this text from ${sourceLang} to ${targetLang} with context notes: "${text}". Return JSON with keys: translation, grammar_notes. Return ONLY valid JSON, no markdown formatting.`;
+        const sourceLang = payload.source_lang || targetLang;
+        const targetLangName = payload.target_lang || 'English';
+        const prompt = `Translate this text from ${sourceLang} to ${targetLangName} with context notes: "${text}". Return JSON with keys: translation, grammar_notes. Return ONLY valid JSON, no markdown formatting.`;
         const aiRes = await callAI(prompt, env, 1000, modelChoice);
         return jsonResponse(cleanJson(aiRes));
       }
 
       if (path === '/quiz') {
-        const topic = payload.topic || 'General German';
+        const topic = payload.topic || `General ${targetLang}`;
         const count = payload.count || 5;
         const level = payload.level || 'A1';
-        const prompt = `Generate a ${count}-question quiz about "${topic}" for German level ${level}. Return JSON with key: questions (array of objects with question, options (array of 4 choices), correct_answer, explanation, difficulty). Return ONLY valid JSON, no markdown formatting.`;
+        const prompt = `Generate a ${count}-question quiz about "${topic}" for ${targetLang} level ${level}. Return JSON with key: questions (array of objects with question, options (array of 4 choices), correct_answer, explanation, difficulty). Return ONLY valid JSON, no markdown formatting.`;
         const aiRes = await callAI(prompt, env, 1200, modelChoice);
         return jsonResponse(cleanJson(aiRes));
       }
@@ -84,14 +85,14 @@ export default {
       if (path === '/correct') {
         const text = (payload.text || '').replace(/[“”]/g, '"').replace(/[‘’]/g, "'");
         const level = payload.level || 'A1';
-        const prompt = `Correct this German text written by an ${level} student: "${text}". Return JSON with keys "corrected_text" and "feedback". Do NOT use unescaped double quotes inside string values. Return ONLY valid JSON.`;
+        const prompt = `Correct this ${targetLang} text written by an ${level} student: "${text}". Return JSON with keys "corrected_text" and "feedback". Do NOT use unescaped double quotes inside string values. Return ONLY valid JSON.`;
         const aiRes = await callAI(prompt, env, 1000, modelChoice);
         return jsonResponse(cleanJson(aiRes));
       }
 
       if (path === '/chat') {
         const message = (url.searchParams.get('message') || payload.message || 'Hallo').replace(/[“”]/g, '"').replace(/[‘’]/g, "'");
-        const prompt = `You are an encouraging German tutor. Student says: "${message}". Respond in German first, followed by English translation. Keep response concise and helpful.`;
+        const prompt = `You are an encouraging ${targetLang} tutor. Student says: "${message}". Respond in ${targetLang} first, followed by English translation. Keep response concise and helpful.`;
         const aiRes = await callAI(prompt, env, 400, modelChoice);
         return jsonResponse({ response: aiRes });
       }
