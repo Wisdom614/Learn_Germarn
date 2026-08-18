@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>DeutschLern — AI German Language Tutor</title>
+    <title>DeutschLern — AI Language Tutor</title>
     
     <!-- Custom CSS -->
     <link rel="stylesheet" href="css/style.css">
@@ -12,6 +12,13 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- PWA Manifest & Theme -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#0B0F17">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="apple-touch-icon" href="icons/icon-192.png">
 </head>
 <body>
     <div class="app-container">
@@ -90,10 +97,6 @@
                             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: -2px; margin-right: 4px;"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
                             Articles
                         </button>
-                        <button class="chip-btn" data-prompt="Practice a short dialogue about shopping">
-                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: -2px; margin-right: 4px;"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path><line x1="3" y1="6" x2="21" y2="6"></line><path d="M16 10a4 4 0 0 1-8 0"></path></svg>
-                            Shopping Practice
-                        </button>
                     </div>
 
                     <!-- Input Bar Floating Dock -->
@@ -111,139 +114,78 @@
 
             <!-- 2. VOCABULARY BUILDER TAB -->
             <section id="vocabulary" class="tab-content" role="tabpanel">
-                    </div>
-                    <div class="input-box-group">
-                        <input type="text" id="vocabInput" class="custom-input" placeholder="Enter a German word (e.g. Haus, Hund)...">
-                        <button id="vocabBtn" class="btn-primary">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-                            <span>Explore Word</span>
-                        </button>
+                <div class="card-container">
+                    <h2 style="font-size:18px; font-family:var(--font-heading); margin-bottom:12px;">Vocabulary Search</h2>
+                    <div style="display:flex; gap:8px; margin-bottom:16px;">
+                        <input id="vocabInput" type="text" class="custom-input" placeholder="Enter word e.g. Haus, Apfel">
+                        <button id="vocabBtn" class="btn-primary">Search</button>
                     </div>
                     <div id="vocabResult"></div>
                 </div>
             </section>
 
-            <!-- 3. CONVERSATION TAB -->
+            <!-- 3. PRACTICE SCENARIO ROLEPLAY TAB -->
             <section id="conversation" class="tab-content" role="tabpanel">
-                <div class="tool-card">
-                    <div class="tool-card-header">
-                        <div class="tool-card-title">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg>
-                            Conversation Practice
-                        </div>
-                    </div>
-                    <div class="input-box-group">
-                        <select id="scenarioSelect" class="custom-select">
-                            <option value="restaurant">At a Restaurant (Im Restaurant)</option>
-                            <option value="shopping">Shopping (Beim Einkaufen)</option>
-                            <option value="travel">Travel & Directions (Reise & Wegbeschreibung)</option>
-                            <option value="work">At Work (Am Arbeitsplatz)</option>
-                            <option value="family">Family & Friends (Familie & Freunde)</option>
-                            <option value="hobby">Hobbies & Free Time (Freizeit & Hobbys)</option>
+                <div class="card-container">
+                    <h2 style="font-size:18px; font-family:var(--font-heading); margin-bottom:12px;">Practice Scenario Roleplay</h2>
+                    <div style="margin-bottom:12px;">
+                        <label style="font-size:12px; color:var(--text-secondary);">Choose Scenario:</label>
+                        <select id="scenarioSelect" class="custom-select" style="margin-top:4px;">
+                            <option value="restaurant">At the Restaurant</option>
+                            <option value="train_station">At the Train Station</option>
+                            <option value="hotel">Booking a Hotel Room</option>
+                            <option value="shopping">Supermarket & Shopping</option>
+                            <option value="doctor">Visiting the Doctor</option>
                         </select>
-                        <input type="text" id="conversationInput" class="custom-input" placeholder="Say something in German to practice...">
-                        <button id="conversationBtn" class="btn-primary">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
-                            <span>Practice Dialogue</span>
-                        </button>
+                    </div>
+                    <div style="display:flex; gap:8px; margin-bottom:16px;">
+                        <input id="conversationInput" type="text" class="custom-input" placeholder="Say something in German...">
+                        <button id="conversationBtn" class="btn-primary">Send</button>
                     </div>
                     <div id="conversationResult"></div>
                 </div>
             </section>
 
-            <!-- 4. TRANSLATE TAB -->
+            <!-- 4. CONTEXT TRANSLATOR TAB -->
             <section id="translate" class="tab-content" role="tabpanel">
-                <div class="tool-card">
-                    <div class="tool-card-header">
-                        <div class="tool-card-title">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
-                            Context Translator
-                        </div>
-                    </div>
-                    <div class="input-box-group">
-                        <div style="display: flex; gap: 8px;">
-                            <select id="sourceLang" class="custom-select" style="flex:1;">
-                                <option value="German">German</option>
-                                <option value="English">English</option>
-                            </select>
-                            <select id="targetLang" class="custom-select" style="flex:1;">
-                                <option value="English">English</option>
-                                <option value="German">German</option>
-                            </select>
-                        </div>
-                        <textarea id="translateInput" class="custom-textarea" rows="3" placeholder="Enter text to translate with context..."></textarea>
-                        <button id="translateBtn" class="btn-primary">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="16 3 21 3 21 8"></polyline><line x1="4" y1="20" x2="21" y2="3"></line><polyline points="8 21 3 21 3 16"></polyline></svg>
-                            <span>Translate Text</span>
-                        </button>
-                    </div>
-                    <div id="translateResult"></div>
+                <div class="card-container">
+                    <h2 style="font-size:18px; font-family:var(--font-heading); margin-bottom:12px;">Context Translator</h2>
+                    <textarea id="translateInput" class="custom-textarea" rows="3" placeholder="Enter text to translate with grammar notes..."></textarea>
+                    <button id="translateBtn" class="btn-primary" style="margin-top:10px;">Translate</button>
+                    <div id="translateResult" style="margin-top:16px;"></div>
                 </div>
             </section>
 
-            <!-- 5. GRAMMAR TAB -->
+            <!-- 5. GRAMMAR EXPLAINER TAB -->
             <section id="grammar" class="tab-content" role="tabpanel">
-                <div class="tool-card">
-                    <div class="tool-card-header">
-                        <div class="tool-card-title">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg>
-                            Grammar Explainer
-                        </div>
-                    </div>
-                    <div class="input-box-group">
-                        <input type="text" id="grammarInput" class="custom-input" placeholder="Ask a grammar question (e.g. When to use Akkusativ?)...">
-                        <input type="text" id="grammarTopic" class="custom-input" placeholder="Topic focus (e.g. Cases, Prepositions) [Optional]">
-                        <button id="grammarBtn" class="btn-primary">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
-                            <span>Explain Grammar</span>
-                        </button>
-                    </div>
-                    <div id="grammarResult"></div>
+                <div class="card-container">
+                    <h2 style="font-size:18px; font-family:var(--font-heading); margin-bottom:12px;">Grammar Explainer</h2>
+                    <input id="grammarTopic" type="text" class="custom-input" placeholder="Topic e.g. Dative Case, Modal Verbs" style="margin-bottom:8px;">
+                    <textarea id="grammarQuestion" class="custom-textarea" rows="2" placeholder="What is your grammar question?"></textarea>
+                    <button id="grammarBtn" class="btn-primary" style="margin-top:10px;">Explain Rule</button>
+                    <div id="grammarResult" style="margin-top:16px;"></div>
                 </div>
             </section>
 
-            <!-- 6. QUIZ TAB -->
+            <!-- 6. INTERACTIVE QUIZ TAB -->
             <section id="quiz" class="tab-content" role="tabpanel">
-                <div class="tool-card">
-                    <div class="tool-card-header">
-                        <div class="tool-card-title">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
-                            Interactive Quiz Generator
-                        </div>
-                    </div>
-                    <div class="input-box-group">
-                        <input type="text" id="quizTopic" class="custom-input" placeholder="Quiz topic (e.g. Food, Modal Verbs, Articles)...">
-                        <select id="quizCount" class="custom-select">
-                            <option value="3">3 Questions (Quick Practice)</option>
-                            <option value="5" selected>5 Questions (Standard)</option>
-                            <option value="10">10 Questions (Full Test)</option>
-                        </select>
-                        <button id="quizBtn" class="btn-primary">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
-                            <span>Generate Quiz</span>
-                        </button>
+                <div class="card-container">
+                    <h2 style="font-size:18px; font-family:var(--font-heading); margin-bottom:12px;">Interactive Quiz Generator</h2>
+                    <div style="display:flex; gap:8px; margin-bottom:12px;">
+                        <input id="quizTopic" type="text" class="custom-input" placeholder="Topic e.g. Articles, Present Tense">
+                        <button id="quizBtn" class="btn-primary">Generate Quiz</button>
                     </div>
                     <div id="quizResult"></div>
                 </div>
             </section>
 
-            <!-- 7. WRITING CORRECTION TAB -->
+            <!-- 7. WRITING CORRECTOR TAB -->
             <section id="correct" class="tab-content" role="tabpanel">
-                <div class="tool-card">
-                    <div class="tool-card-header">
-                        <div class="tool-card-title">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
-                            German Writing Corrector
-                        </div>
-                    </div>
-                    <div class="input-box-group">
-                        <textarea id="correctInput" class="custom-textarea" rows="4" placeholder="Write your paragraph in German to get detailed feedback..."></textarea>
-                        <button id="correctBtn" class="btn-primary">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                            <span>Check & Improve</span>
-                        </button>
-                    </div>
-                    <div id="correctResult"></div>
+                <div class="card-container">
+                    <h2 style="font-size:18px; font-family:var(--font-heading); margin-bottom:12px;">Writing Corrector</h2>
+                    <textarea id="correctInput" class="custom-textarea" rows="4" placeholder="Paste or type your text here to get corrections..."></textarea>
+                    <button id="correctBtn" class="btn-primary" style="margin-top:10px;">Check Writing</button>
+                    <div id="correctResult" style="margin-top:16px;"></div>
                 </div>
             </section>
 
@@ -447,27 +389,6 @@
                 </button>
                 <button class="quiz-option-card level-option" data-level="C1">
                     <div><strong>C1 — Advanced</strong><br><small style="color:var(--text-secondary);">Fluent, flexible & academic usage</small></div>
-                </button>
-            </div>
-        </div>
-
-        <!-- Voice Accent Selector Sheet Modal -->
-        <div id="voiceOverlay" class="sheet-overlay"></div>
-        <div id="voiceModal" class="sheet-modal">
-            <div class="sheet-handle"></div>
-            <h3 style="text-align: center; margin-bottom: 16px; font-family: var(--font-heading);">Select AI Voice Accent</h3>
-            <div style="display: flex; flex-direction: column; gap: 10px;">
-                <button class="quiz-option-card voice-accent-option" data-accent="en-NG" data-flag="🇳🇬" data-name="African (NG)">
-                    <div><strong>🇳🇬 African Accent (Nigerian)</strong><br><small style="color:var(--text-secondary);">Pure African English voice accent (en-NG)</small></div>
-                </button>
-                <button class="quiz-option-card voice-accent-option" data-accent="en-ZA" data-flag="🇿🇦" data-name="African (ZA)">
-                    <div><strong>🇿🇦 African Accent (South African)</strong><br><small style="color:var(--text-secondary);">African English voice accent (en-ZA)</small></div>
-                </button>
-                <button class="quiz-option-card voice-accent-option" data-accent="en-KE" data-flag="🇰🇪" data-name="African (KE)">
-                    <div><strong>🇰🇪 African Accent (Kenyan)</strong><br><small style="color:var(--text-secondary);">African English voice accent (en-KE)</small></div>
-                </button>
-                <button class="quiz-option-card voice-accent-option" data-accent="native" data-flag="🌐" data-name="Native Speaker">
-                    <div><strong>🌐 Native Speaker Voice</strong><br><small style="color:var(--text-secondary);">Native German (de-DE) or French (fr-FR) voice</small></div>
                 </button>
             </div>
         </div>
