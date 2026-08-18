@@ -2,13 +2,15 @@
  * DeutschLern PWA Service Worker
  * Offline Caching & Instant App Launch
  */
-const CACHE_NAME = 'deutschlern-v4';
+const CACHE_NAME = 'deutschlern-v6';
 const ASSETS_TO_CACHE = [
   '/',
   '/index.html',
   '/css/style.css',
   '/js/app.js',
-  '/manifest.json'
+  '/manifest.json',
+  '/icons/icon-192.png',
+  '/icons/icon-512.png'
 ];
 
 self.addEventListener('install', (event) => {

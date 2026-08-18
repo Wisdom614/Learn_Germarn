@@ -15,10 +15,11 @@
     
     <!-- PWA Manifest & Theme -->
     <link rel="manifest" href="manifest.json">
+    <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
     <meta name="theme-color" content="#0B0F17">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <link rel="apple-touch-icon" href="icons/image.png">
+    <link rel="apple-touch-icon" sizes="192x192" href="icons/icon-192.png">
 </head>
 <body>
     <div class="app-container">
@@ -27,11 +28,7 @@
         <header class="app-header">
             <div class="brand-section">
                 <div class="brand-logo">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                        <circle cx="12" cy="12" r="10"></circle>
-                        <line x1="2" y1="12" x2="22" y2="12"></line>
-                        <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
-                    </svg>
+                    <img src="icons/icon-192.png" alt="DeutschLern">
                 </div>
                 <div class="brand-title">DeutschLern</div>
             </div>
@@ -397,7 +394,7 @@
         <div id="installOverlay" class="install-overlay" hidden></div>
         <section id="installPrompt" class="install-prompt" role="dialog" aria-modal="true" aria-labelledby="installPromptTitle" hidden>
             <button id="dismissInstallPrompt" class="install-dismiss" type="button" aria-label="Dismiss install prompt">&times;</button>
-            <div class="install-prompt-icon" aria-hidden="true">DL</div>
+            <img class="install-prompt-icon" src="icons/icon-192.png" alt="">
             <p class="install-eyebrow">LEARN ANYWHERE</p>
             <h2 id="installPromptTitle">Install DeutschLern</h2>
             <p id="installPromptText">Add DeutschLern to your device for a faster, full-screen learning experience.</p>
