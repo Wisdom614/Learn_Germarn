@@ -308,6 +308,12 @@ function setupEventListeners() {
             const textToSpeak = audioBtn.dataset.text;
             if (textToSpeak) speakGerman(textToSpeak);
         }
+
+        const flashcardBtn = e.target.closest('.save-flashcard-btn');
+        if (flashcardBtn) {
+            const { word, translation, gender, pronunciation, example } = flashcardBtn.dataset;
+            saveToFlashcards(word, translation, gender, pronunciation, example);
+        }
     });
 }
 
@@ -531,10 +537,21 @@ function renderVocabulary(data) {
             <div class="vocab-detail-row">
                 ${data.pronunciation ? `<div><strong>Pronunciation:</strong> ${data.pronunciation}</div>` : ''}
                 
-                <button class="audio-btn audio-trigger-btn" data-text="${data.word}">
-                    ${ICONS.audio}
-                    <span>Listen Word</span>
-                </button>
+                <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap; margin-top:6px;">
+                    <button class="audio-btn audio-trigger-btn" data-text="${data.word}">
+                        ${ICONS.audio}
+                        <span>Listen Word</span>
+                    </button>
+
+                    <button class="audio-btn save-flashcard-btn" style="background:rgba(234,179,8,0.1); color:var(--warning); border-color:var(--warning);"
+                        data-word="${(data.word||'').replace(/"/g, '&quot;')}"
+                        data-translation="${(data.translation||'').replace(/"/g, '&quot;')}"
+                        data-gender="${data.gender||''}"
+                        data-pronunciation="${(data.pronunciation||'').replace(/"/g, '&quot;')}"
+                        data-example="${(data.examples?.[0]?.german||'').replace(/"/g, '&quot;')}">
+                        ⭐ Save Flashcard
+                    </button>
+                </div>
                 
                 ${data.memory_tip ? `
                     <div style="margin-top:10px; background:rgba(99,102,241,0.1); padding:10px; border-radius:8px; font-size:13px; display:flex; gap:8px; align-items:flex-start;">
@@ -880,5 +897,210 @@ function toggleVoiceRecording() {
         } catch (e) {
             console.error(e);
         }
+    }
+}
+
+// ==================== FLASHCARDS CONTROLLER ====================
+const flashcardState = {
+    cards: JSON.parse(localStorage.getItem('deutschlern_flashcards') || '[]'),
+    currentIndex: 0
+};
+
+function saveToFlashcards(word, translation, gender, pronunciation, example) {
+    if (!word || !translation) return;
+
+    const exists = flashcardState.cards.some(c => c.word.toLowerCase() === word.toLowerCase());
+    if (exists) {
+        showToast(`'${word}' is already in your Flashcards!`);
+        return;
+    }
+
+    flashcardState.cards.push({
+        word,
+        translation,
+        gender: gender || '',
+        pronunciation: pronunciation || '',
+        example: example || '',
+        dateSaved: Date.now()
+    });
+
+    localStorage.setItem('deutschlern_flashcards', JSON.stringify(flashcardState.cards));
+    showToast(`⭐ Saved '${word}' to Flashcards!`);
+    renderFlashcards();
+}
+
+function renderFlashcards() {
+    const countDisplay = document.getElementById('flashcardCountDisplay');
+    const deckView = document.getElementById('flashcardDeckView');
+    if (!deckView) return;
+
+    const total = flashcardState.cards.length;
+    if (countDisplay) {
+        countDisplay.textContent = `${total} card${total !== 1 ? 's' : ''} in your deck`;
+    }
+
+    if (total === 0) {
+        deckView.innerHTML = `
+            <div class="result-card" style="text-align:center; padding:40px 20px;">
+                <div style="font-size:36px; margin-bottom:12px;">🎴</div>
+                <h4 style="font-family:var(--font-heading); margin-bottom:8px;">No Flashcards Saved Yet</h4>
+                <p style="color:var(--text-secondary); font-size:13px; margin-bottom:18px;">Search words in the Vocabulary tab and tap "⭐ Save Flashcard" to build your deck!</p>
+                <button class="btn-primary" onclick="switchTab('vocabulary')">Search Vocabulary ➔</button>
+            </div>
+        `;
+        return;
+    }
+
+    if (flashcardState.currentIndex >= total) {
+        flashcardState.currentIndex = 0;
+    }
+
+    const card = flashcardState.cards[flashcardState.currentIndex];
+    const genderClass = card.gender ? card.gender.toLowerCase() : '';
+
+    deckView.innerHTML = `
+        <div style="display:flex; justify-content:space-between; align-items:center; font-size:12px; color:var(--text-muted); margin-bottom:8px;">
+            <span>Card ${flashcardState.currentIndex + 1} of ${total}</span>
+            <span>Tap card to flip</span>
+        </div>
+
+        <div class="flashcard-wrapper" onclick="this.classList.toggle('flipped')">
+            <div class="flashcard-inner">
+                <!-- Front Side -->
+                <div class="flashcard-front">
+                    <div style="display:flex; justify-content:space-between; width:100%; align-items:center;">
+                        <span class="level-chip">German</span>
+                        ${card.gender ? `<span class="gender-badge ${genderClass}">${card.gender}</span>` : ''}
+                    </div>
+
+                    <div>
+                        <div style="font-size:28px; font-family:var(--font-heading); font-weight:800; color:#FFF; margin-bottom:4px;">
+                            ${card.word}
+                        </div>
+                        ${card.pronunciation ? `<div style="color:var(--text-secondary); font-size:14px;">[${card.pronunciation}]</div>` : ''}
+                    </div>
+
+                    <div style="display:flex; gap:8px; align-items:center;">
+                        <button class="audio-btn audio-trigger-btn" data-text="${card.word}" onclick="event.stopPropagation();">
+                            ${ICONS.audio} Listen
+                        </button>
+                        <span style="font-size:12px; color:var(--text-muted);">🔄 Tap to flip</span>
+                    </div>
+                </div>
+
+                <!-- Back Side -->
+                <div class="flashcard-back">
+                    <div style="display:flex; justify-content:space-between; width:100%; align-items:center;">
+                        <span class="level-chip" style="background:rgba(16,185,129,0.15); color:var(--success);">English</span>
+                    </div>
+
+                    <div>
+                        <div style="font-size:24px; font-family:var(--font-heading); font-weight:700; color:var(--primary-light); margin-bottom:8px;">
+                            ${card.translation}
+                        </div>
+                        ${card.example ? `<div style="font-size:13px; color:var(--text-secondary); line-height:1.5;">"${card.example}"</div>` : ''}
+                    </div>
+
+                    <span style="font-size:12px; color:var(--text-muted);">🔄 Tap to flip back</span>
+                </div>
+            </div>
+        </div>
+
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-top:12px; gap:8px;">
+            <button class="chip-btn" onclick="prevFlashcard()" ${flashcardState.currentIndex === 0 ? 'disabled style="opacity:0.4;"' : ''}>
+                ⬅️ Previous
+            </button>
+            
+            <button class="chip-btn" style="color:var(--error); border-color:rgba(239,68,68,0.3);" onclick="removeFlashcard(${flashcardState.currentIndex})">
+                🗑️ Remove
+            </button>
+            
+            <button class="chip-btn" onclick="nextFlashcard()" ${flashcardState.currentIndex === total - 1 ? 'disabled style="opacity:0.4;"' : ''}>
+                Next ➡️
+            </button>
+        </div>
+    `;
+}
+
+function prevFlashcard() {
+    if (flashcardState.currentIndex > 0) {
+        flashcardState.currentIndex--;
+        renderFlashcards();
+    }
+}
+
+function nextFlashcard() {
+    if (flashcardState.currentIndex < flashcardState.cards.length - 1) {
+        flashcardState.currentIndex++;
+        renderFlashcards();
+    }
+}
+
+function removeFlashcard(index) {
+    const card = flashcardState.cards[index];
+    flashcardState.cards.splice(index, 1);
+    localStorage.setItem('deutschlern_flashcards', JSON.stringify(flashcardState.cards));
+    showToast(`Removed '${card.word}' from Flashcards`);
+    if (flashcardState.currentIndex >= flashcardState.cards.length) {
+        flashcardState.currentIndex = Math.max(0, flashcardState.cards.length - 1);
+    }
+    renderFlashcards();
+}
+
+function clearFlashcardDeck() {
+    if (confirm('Are you sure you want to clear your saved flashcards?')) {
+        flashcardState.cards = [];
+        flashcardState.currentIndex = 0;
+        localStorage.removeItem('deutschlern_flashcards');
+        showToast('Flashcard deck cleared');
+        renderFlashcards();
+    }
+}
+
+// Global functions for inline HTML events
+window.saveToFlashcards = saveToFlashcards;
+window.prevFlashcard = prevFlashcard;
+window.nextFlashcard = nextFlashcard;
+window.removeFlashcard = removeFlashcard;
+
+// Attach Flashcards & PWA initializations on page load
+document.addEventListener('DOMContentLoaded', () => {
+    renderFlashcards();
+    const clearBtn = document.getElementById('clearDeckBtn');
+    if (clearBtn) clearBtn.addEventListener('click', clearFlashcardDeck);
+    initPwaInstaller();
+});
+
+// ==================== PWA INSTALL & SERVICE WORKER CONTROLLER ====================
+let deferredPwaPrompt = null;
+
+function initPwaInstaller() {
+    window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault();
+        deferredPwaPrompt = e;
+        if (DOM.pwaInstallBtn) {
+            DOM.pwaInstallBtn.style.display = 'flex';
+        }
+    });
+
+    if (DOM.pwaInstallBtn) {
+        DOM.pwaInstallBtn.addEventListener('click', async () => {
+            if (!deferredPwaPrompt) return;
+            deferredPwaPrompt.prompt();
+            const { outcome } = await deferredPwaPrompt.userChoice;
+            if (outcome === 'accepted') {
+                showToast('🎉 DeutschLern installed successfully!');
+            }
+            deferredPwaPrompt = null;
+            DOM.pwaInstallBtn.style.display = 'none';
+        });
+    }
+
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('/sw.js').catch(err => {
+                console.log('Service Worker registration skipped/failed:', err);
+            });
+        });
     }
 }
