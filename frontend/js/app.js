@@ -6,7 +6,9 @@
 
 // ==================== CONFIGURATION & STATE ====================
 const CONFIG = {
-    API_BASE_URL: 'http://localhost:8000',
+    API_BASE_URL: (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
+        ? 'http://localhost:8000'
+        : (window.APP_CONFIG?.API_BASE_URL || window.location.origin),
     USER_ID: 'user_' + Math.random().toString(36).substring(2, 11),
     DEFAULT_LEVEL: 'A1'
 };
