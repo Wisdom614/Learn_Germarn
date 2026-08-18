@@ -29,7 +29,11 @@
                 <div class="brand-title">DeutschLern</div>
             </div>
             
-            <div class="header-actions" style="display:flex; gap:8px; align-items:center;">
+            <div class="header-actions" style="display:flex; gap:6px; align-items:center;">
+                <button id="voiceAccentBtn" class="level-badge-btn" title="Switch AI Voice Accent">
+                    <span id="currentAccentFlag">🇳🇬</span>
+                    <span id="currentAccentDisplay" class="level-chip">African (NG)</span>
+                </button>
                 <button id="langBadgeBtn" class="level-badge-btn" title="Switch Target Language">
                     <span id="currentLangFlag">🇩🇪</span>
                     <span id="currentLangDisplay" class="level-chip">German</span>
@@ -353,6 +357,27 @@
                 </button>
                 <button class="quiz-option-card level-option" data-level="C1">
                     <div><strong>C1 — Advanced</strong><br><small style="color:var(--text-secondary);">Fluent, flexible & academic usage</small></div>
+                </button>
+            </div>
+        </div>
+
+        <!-- Voice Accent Selector Sheet Modal -->
+        <div id="voiceOverlay" class="sheet-overlay"></div>
+        <div id="voiceModal" class="sheet-modal">
+            <div class="sheet-handle"></div>
+            <h3 style="text-align: center; margin-bottom: 16px; font-family: var(--font-heading);">Select AI Voice Accent</h3>
+            <div style="display: flex; flex-direction: column; gap: 10px;">
+                <button class="quiz-option-card voice-accent-option" data-accent="en-NG" data-flag="🇳🇬" data-name="African (NG)">
+                    <div><strong>🇳🇬 African Accent (Nigerian)</strong><br><small style="color:var(--text-secondary);">Pure African English voice accent (en-NG)</small></div>
+                </button>
+                <button class="quiz-option-card voice-accent-option" data-accent="en-ZA" data-flag="🇿🇦" data-name="African (ZA)">
+                    <div><strong>🇿🇦 African Accent (South African)</strong><br><small style="color:var(--text-secondary);">African English voice accent (en-ZA)</small></div>
+                </button>
+                <button class="quiz-option-card voice-accent-option" data-accent="en-KE" data-flag="🇰🇪" data-name="African (KE)">
+                    <div><strong>🇰🇪 African Accent (Kenyan)</strong><br><small style="color:var(--text-secondary);">African English voice accent (en-KE)</small></div>
+                </button>
+                <button class="quiz-option-card voice-accent-option" data-accent="native" data-flag="🌐" data-name="Native Speaker">
+                    <div><strong>🌐 Native Speaker Voice</strong><br><small style="color:var(--text-secondary);">Native German (de-DE) or French (fr-FR) voice</small></div>
                 </button>
             </div>
         </div>

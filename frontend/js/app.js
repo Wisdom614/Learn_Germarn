@@ -16,6 +16,7 @@ const CONFIG = {
 const state = {
     currentLevel: localStorage.getItem('deutschlern_level') || CONFIG.DEFAULT_LEVEL,
     currentLanguage: localStorage.getItem('lingolern_language') || 'German',
+    voiceAccent: localStorage.getItem('lingolern_voice_accent') || 'en-NG',
     currentTab: 'chat',
     isLoading: false,
     selectedModel: 'auto',
@@ -42,6 +43,9 @@ const ICONS = {
 // ==================== DOM CACHE ====================
 const DOM = {
     // Header & Navigation
+    voiceAccentBtn: document.getElementById('voiceAccentBtn'),
+    currentAccentFlag: document.getElementById('currentAccentFlag'),
+    currentAccentDisplay: document.getElementById('currentAccentDisplay'),
     langBadgeBtn: document.getElementById('langBadgeBtn'),
     currentLangFlag: document.getElementById('currentLangFlag'),
     currentLangDisplay: document.getElementById('currentLangDisplay'),
@@ -57,6 +61,9 @@ const DOM = {
     levelOverlay: document.getElementById('levelOverlay'),
     levelModal: document.getElementById('levelModal'),
     levelOptions: document.querySelectorAll('.level-option'),
+    voiceOverlay: document.getElementById('voiceOverlay'),
+    voiceModal: document.getElementById('voiceModal'),
+    voiceAccentOptions: document.querySelectorAll('.voice-accent-option'),
 
     // Global Overlays
     loadingOverlay: document.getElementById('loadingOverlay'),
@@ -155,19 +162,37 @@ function speakText(text) {
     if (!cleanText) return;
 
     const utterance = new SpeechSynthesisUtterance(cleanText);
-    const targetLangCode = state.currentLanguage === 'French' ? 'fr-FR' : 'de-DE';
-    utterance.lang = targetLangCode;
-    utterance.rate = 0.9;
-
     const voices = window.speechSynthesis.getVoices();
-    const langPrefix = state.currentLanguage === 'French' ? 'fr' : 'de';
-    const targetVoice = voices.find(v => v.lang.startsWith(langPrefix));
-    if (targetVoice) {
-        utterance.voice = targetVoice;
+    let selectedVoice = null;
+    const accent = state.voiceAccent || 'en-NG';
+
+    if (accent === 'en-NG') {
+        selectedVoice = voices.find(v => v.lang.includes('NG') || v.name.toLowerCase().includes('nigeria') || v.name.toLowerCase().includes('africa'));
+        if (selectedVoice) utterance.lang = 'en-NG';
+    } else if (accent === 'en-ZA') {
+        selectedVoice = voices.find(v => v.lang.includes('ZA') || v.name.toLowerCase().includes('south africa'));
+        if (selectedVoice) utterance.lang = 'en-ZA';
+    } else if (accent === 'en-KE') {
+        selectedVoice = voices.find(v => v.lang.includes('KE') || v.name.toLowerCase().includes('kenya'));
+        if (selectedVoice) utterance.lang = 'en-KE';
     }
 
+    if (!selectedVoice) {
+        const targetLangCode = state.currentLanguage === 'French' ? 'fr-FR' : 'de-DE';
+        const langPrefix = state.currentLanguage === 'French' ? 'fr' : 'de';
+        selectedVoice = voices.find(v => v.lang.startsWith(langPrefix));
+        utterance.lang = targetLangCode;
+    }
+
+    if (selectedVoice) {
+        utterance.voice = selectedVoice;
+    }
+
+    utterance.rate = 0.92;
+    utterance.pitch = accent.startsWith('en-') ? 1.05 : 1.0;
+
     window.speechSynthesis.speak(utterance);
-    showToast(`Playing ${state.currentLanguage} audio...`);
+    showToast(`Playing audio (${accent === 'native' ? state.currentLanguage : 'African Accent'})...`);
 }
 const speakGerman = speakText;
 
@@ -208,10 +233,22 @@ function openLevelModal() {
     }
 }
 
+function openVoiceModal() {
+    if (DOM.voiceOverlay && DOM.voiceModal) {
+        DOM.voiceOverlay.classList.add('active');
+        DOM.voiceModal.classList.add('active');
+    }
+}
+
 function closeModalSheets() {
-    [DOM.drawerOverlay, DOM.drawerModal, DOM.levelOverlay, DOM.levelModal].forEach(el => {
+    [DOM.drawerOverlay, DOM.drawerModal, DOM.levelOverlay, DOM.levelModal, DOM.voiceOverlay, DOM.voiceModal].forEach(el => {
         if (el) el.classList.remove('active');
     });
+}
+
+function updateVoiceAccentUI(flag, name) {
+    if (DOM.currentAccentFlag) DOM.currentAccentFlag.textContent = flag || '🇳🇬';
+    if (DOM.currentAccentDisplay) DOM.currentAccentDisplay.textContent = name || 'African (NG)';
 }
 
 function setupEventListeners() {
@@ -246,8 +283,25 @@ function setupEventListeners() {
         });
     });
 
+    if (DOM.voiceAccentBtn) {
+        DOM.voiceAccentBtn.addEventListener('click', openVoiceModal);
+    }
+    DOM.voiceAccentOptions.forEach(opt => {
+        opt.addEventListener('click', () => {
+            const accent = opt.dataset.accent;
+            const flag = opt.dataset.flag;
+            const name = opt.dataset.name;
+            state.voiceAccent = accent;
+            localStorage.setItem('lingolern_voice_accent', accent);
+            updateVoiceAccentUI(flag, name);
+            closeModalSheets();
+            showToast(`AI Voice Accent set to ${name}`);
+        });
+    });
+
     if (DOM.drawerOverlay) DOM.drawerOverlay.addEventListener('click', closeModalSheets);
     if (DOM.levelOverlay) DOM.levelOverlay.addEventListener('click', closeModalSheets);
+    if (DOM.voiceOverlay) DOM.voiceOverlay.addEventListener('click', closeModalSheets);
 
     if (DOM.chatSendBtn) DOM.chatSendBtn.addEventListener('click', handleChatSend);
     if (DOM.chatInput) {
