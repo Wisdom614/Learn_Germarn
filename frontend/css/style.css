@@ -1,51 +1,51 @@
 :root {
   /* ==========================================================================
-     Warm Earth + Sage & Terracotta - Natural, Calming, Premium Design System
+     Emerald & Gold - Sleek, High-End, Vibrant & Crisp Design System
      ========================================================================== */
 
   /* Backgrounds */
-  --bg-main: #0F110C;             /* Deep forest black */
-  --bg-subtle: #1A1D16;           /* Dark olive background */
-  --bg-card: rgba(30, 35, 25, 0.85);
-  --bg-card-hover: rgba(40, 46, 34, 0.92);
-  --bg-elevated: #23281E;
-  --bg-input: rgba(26, 29, 22, 0.85);
+  --bg-main: #0B0F17;             /* Deep obsidian black */
+  --bg-subtle: #111827;           /* Slate charcoal */
+  --bg-card: rgba(17, 24, 39, 0.85);
+  --bg-card-hover: rgba(31, 41, 55, 0.92);
+  --bg-elevated: #1F2937;
+  --bg-input: rgba(17, 24, 39, 0.9);
 
   /* Borders */
-  --border-glass: rgba(180, 170, 140, 0.14);
-  --border-glass-hover: rgba(200, 190, 160, 0.28);
-  --border-accent: rgba(140, 168, 106, 0.4);
+  --border-glass: rgba(255, 255, 255, 0.08);
+  --border-glass-hover: rgba(16, 185, 129, 0.25);
+  --border-accent: rgba(16, 185, 129, 0.4);
 
-  /* Accents - Sage Green + Terracotta + Wheat Gold */
-  --primary: #8CA86A;             /* Sage green */
-  --primary-hover: #7A9A58;
-  --primary-light: rgba(140, 168, 106, 0.18);
-  --gradient-primary: linear-gradient(135deg, #8CA86A 0%, #C4A882 50%, #D4A574 100%);
-  --gradient-card: linear-gradient(145deg, rgba(35, 40, 30, 0.7) 0%, rgba(20, 24, 18, 0.85) 100%);
-  --gradient-badge: linear-gradient(135deg, #8CA86A 0%, #7A9A58 100%);
+  /* Accents - Emerald Green + Champagne Gold */
+  --primary: #10B981;             /* Deep Emerald Green */
+  --primary-hover: #059669;
+  --primary-light: rgba(16, 185, 129, 0.15);
+  --gradient-primary: linear-gradient(135deg, #10B981 0%, #059669 50%, #F59E0B 100%);
+  --gradient-card: linear-gradient(145deg, rgba(31, 41, 55, 0.7) 0%, rgba(17, 24, 39, 0.85) 100%);
+  --gradient-badge: linear-gradient(135deg, #10B981 0%, #059669 100%);
 
   /* Text & Typography Colors */
-  --text-primary: #ECE8DC;        /* Warm cream */
-  --text-secondary: #B5AD9A;      /* Muted sand */
-  --text-muted: #7A7568;          /* Soft earth */
-  --text-accent: #A8C48A;         /* Bright sage */
+  --text-primary: #F9FAFB;        /* Crisp Off-White */
+  --text-secondary: #9CA3AF;      /* Cool Muted Gray */
+  --text-muted: #6B7280;          /* Subtle Gray */
+  --text-accent: #34D399;         /* Bright Emerald Mint */
 
-  /* Semantic Status Colors (Earthy & Harmonious) */
-  --success: #6E9B7B;             /* Soft forest green */
-  --success-light: rgba(110, 155, 123, 0.18);
-  --warning: #E8C88A;             /* Golden wheat */
-  --warning-light: rgba(232, 200, 138, 0.18);
-  --error: #D96B6B;               /* Warm terracotta red */
-  --error-light: rgba(217, 107, 107, 0.18);
-  --info: #7CB8A4;                /* Muted teal */
+  /* Semantic Status Colors */
+  --success: #10B981;             /* Emerald Green */
+  --success-light: rgba(16, 185, 129, 0.15);
+  --warning: #F59E0B;             /* Champagne Gold */
+  --warning-light: rgba(245, 158, 11, 0.15);
+  --error: #EF4444;               /* Vibrant Red */
+  --error-light: rgba(239, 68, 68, 0.15);
+  --info: #06B6D4;                /* Cyan */
 
-  /* German Noun Gender Coding (Soft Earthy Tones) */
-  --gender-der: #7CB8A4;          /* Muted teal (der) */
-  --gender-der-bg: rgba(124, 184, 164, 0.14);
-  --gender-die: #D4A882;          /* Warm terracotta (die) */
-  --gender-die-bg: rgba(212, 168, 130, 0.14);
-  --gender-das: #E8C88A;          /* Golden wheat (das) */
-  --gender-das-bg: rgba(232, 200, 138, 0.14);
+  /* German Noun Gender Coding */
+  --gender-der: #06B6D4;          /* Cyan (der) */
+  --gender-der-bg: rgba(6, 182, 212, 0.12);
+  --gender-die: #F43F5E;          /* Rose Coral (die) */
+  --gender-die-bg: rgba(244, 63, 94, 0.12);
+  --gender-das: #F59E0B;          /* Champagne Gold (das) */
+  --gender-das-bg: rgba(245, 158, 11, 0.12);
 
   /* Typography Fonts */
   --font-heading: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
@@ -56,7 +56,7 @@
   --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
   --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.45);
   --shadow-lg: 0 16px 32px rgba(0, 0, 0, 0.6);
-  --shadow-glow: 0 0 24px rgba(140, 168, 106, 0.25);
+  --shadow-glow: 0 0 24px rgba(16, 185, 129, 0.25);
 
   /* Spacing & Radii */
   --radius-sm: 8px;
@@ -112,7 +112,7 @@ body::before {
   left: -100px;
   width: 320px;
   height: 320px;
-  background: rgba(140, 168, 106, 0.18);
+  background: rgba(16, 185, 129, 0.18);
 }
 
 body::after {
@@ -120,7 +120,7 @@ body::after {
   right: -100px;
   width: 350px;
   height: 350px;
-  background: rgba(212, 168, 130, 0.14);
+  background: rgba(245, 158, 11, 0.12);
 }
 
 /* App Container */
@@ -145,7 +145,7 @@ body::after {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background: rgba(15, 17, 12, 0.85);
+  background: rgba(11, 15, 23, 0.85);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
   border-bottom: 1px solid var(--border-glass);
@@ -166,7 +166,7 @@ body::after {
   align-items: center;
   justify-content: center;
   font-size: 18px;
-  box-shadow: 0 4px 12px rgba(140, 168, 106, 0.3);
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
 }
 
 .brand-title {
