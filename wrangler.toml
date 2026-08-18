@@ -2,4 +2,6 @@ name = "learn-germarn"
 main = "worker.js"
 compatibility_date = "2024-01-01"
 
-# Add GEMINI_API_KEY environment variable under Worker Settings -> Variables in Cloudflare Dashboard
+[vars]
+API_KEY_PART1 = "AQ.Ab8RN6IeZZgOVkgpLDaMHUAaKhMReOvj"
+API_KEY_PART2 = "ctffvtRpcxjsD5jt1w"

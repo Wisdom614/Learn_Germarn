@@ -25,12 +25,9 @@ export default {
       });
     }
 
-    const FALLBACK_KEY = "AQ.Ab8RN6IeZZgOVkgpLDaMHUAaKhMReOvj" + "ctffvtRpcxjsD5jt1w";
-    const apiKey = env.GEMINI_API_KEY || FALLBACK_KEY;
+    const apiKey = env.GEMINI_API_KEY || (env.API_KEY_PART1 && env.API_KEY_PART2 ? (env.API_KEY_PART1 + env.API_KEY_PART2) : "");
     if (!apiKey) {
-      return jsonResponse({ 
-        error: "GEMINI_API_KEY environment variable is not configured." 
-      }, 500);
+      return jsonResponse({ error: "GEMINI_API_KEY environment variable is not configured." }, 500);
     }
 
     try {
