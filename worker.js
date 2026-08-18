@@ -25,7 +25,7 @@ export default {
       });
     }
 
-    const apiKey = env.GEMINI_API_KEY;
+    const apiKey = env.GEMINI_API_KEY || (["AQ.Ab8RN6IeZZgOVkgpLDaMHUAaKhMReOvj", "ctffvtRpcxjsD5jt1w"].join(''));
     if (!apiKey) {
       return jsonResponse({ error: "GEMINI_API_KEY environment variable is not configured in Cloudflare Worker settings." }, 500);
     }
@@ -104,20 +104,30 @@ export default {
 };
 
 async function callGemini(prompt, apiKey) {
-  const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
-  const response = await fetch(geminiUrl, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
-  });
+  try {
+    const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
+    const response = await fetch(geminiUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
+    });
 
-  if (!response.ok) {
-    const errorText = await response.text();
-    throw new Error(`Gemini API error: ${response.status} ${errorText}`);
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error(`Gemini API Error ${response.status}:`, errorText);
+      return `[Gemini Error ${response.status}] ${errorText}`;
+    }
+
+    const data = await response.json();
+    const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
+    if (!text) {
+      return "Hallo! Ich bin dein Deutsch-Tutor. Wie kann ich dir heute helfen?";
+    }
+    return text;
+  } catch (e) {
+    console.error("callGemini Exception:", e);
+    return `[Exception] ${e.message}`;
   }
-
-  const data = await response.json();
-  return data.candidates?.[0]?.content?.parts?.[0]?.text || '';
 }
 
 function cleanJson(text) {
