@@ -293,8 +293,20 @@ function setupEventListeners() {
 }
 
 // ==================== API FETCH HELPER ====================
-async function apiCall(endpoint, payload) {
-    showLoading(true);
+async function apiCall(endpoint, payload, targetElement = null) {
+    if (targetElement) {
+        targetElement.innerHTML = `
+            <div class="inline-loading-box">
+                <div class="typing-indicator">
+                    <div class="typing-dot"></div>
+                    <div class="typing-dot"></div>
+                    <div class="typing-dot"></div>
+                </div>
+                <span>Gemini AI is thinking...</span>
+            </div>
+        `;
+    }
+
     try {
         const response = await fetch(`${CONFIG.API_BASE_URL}${endpoint}`, {
             method: 'POST',
@@ -314,8 +326,6 @@ async function apiCall(endpoint, payload) {
         console.error(`API Error on ${endpoint}:`, err);
         showToast(`Error: ${err.message}`);
         throw err;
-    } finally {
-        showLoading(false);
     }
 }
 
@@ -329,12 +339,14 @@ async function handleChatSend() {
     appendChatMessage('user', text);
     DOM.chatInput.value = '';
 
+    const typingRow = appendTypingIndicator();
+
     try {
         const url = `${CONFIG.API_BASE_URL}/chat?user_id=${encodeURIComponent(CONFIG.USER_ID)}&message=${encodeURIComponent(text)}`;
-        showLoading(true);
         const res = await fetch(url, { method: 'POST' });
         const data = await res.json();
-        showLoading(false);
+        
+        if (typingRow) typingRow.remove();
 
         if (data.response) {
             appendChatMessage('bot', data.response);
@@ -345,9 +357,35 @@ async function handleChatSend() {
             appendChatMessage('bot', 'Sorry, I had trouble generating a response.');
         }
     } catch (err) {
-        showLoading(false);
-        appendChatMessage('bot', 'Connection error. Please make sure backend is running.');
+        if (typingRow) typingRow.remove();
+        appendChatMessage('bot', 'Connection error. Please try again.');
     }
+}
+
+function appendTypingIndicator() {
+    const row = document.createElement('div');
+    row.className = 'msg-row bot typing-indicator-row';
+
+    const avatar = document.createElement('div');
+    avatar.className = 'avatar';
+    avatar.innerHTML = ICONS.bot;
+
+    const bubble = document.createElement('div');
+    bubble.className = 'msg-bubble';
+    bubble.innerHTML = `
+        <div class="typing-indicator">
+            <div class="typing-dot"></div>
+            <div class="typing-dot"></div>
+            <div class="typing-dot"></div>
+        </div>
+    `;
+
+    row.appendChild(avatar);
+    row.appendChild(bubble);
+
+    DOM.chatMessages.appendChild(row);
+    DOM.chatMessages.scrollTop = DOM.chatMessages.scrollHeight;
+    return row;
 }
 
 function appendChatMessage(sender, text) {
@@ -389,7 +427,7 @@ async function handleVocabulary() {
     }
 
     try {
-        const data = await apiCall('/vocabulary', { word, language: 'German' });
+        const data = await apiCall('/vocabulary', { word, language: 'German' }, DOM.vocabResult);
         renderVocabulary(data);
     } catch (err) {}
 }
@@ -455,7 +493,7 @@ async function handleConversation() {
             scenario,
             user_input,
             level: state.currentLevel
-        });
+        }, DOM.conversationResult);
         renderConversation(data);
     } catch (err) {}
 }
@@ -510,7 +548,7 @@ async function handleTranslate() {
             text,
             source_lang: DOM.sourceLang.value,
             target_lang: DOM.targetLang.value
-        });
+        }, DOM.translateResult);
         renderTranslate(data);
     } catch (err) {}
 }
@@ -546,7 +584,7 @@ async function handleGrammar() {
         const data = await apiCall('/grammar', {
             question,
             topic: DOM.grammarTopic.value.trim() || undefined
-        });
+        }, DOM.grammarResult);
         renderGrammar(data);
     } catch (err) {}
 }
@@ -582,7 +620,7 @@ async function handleQuiz() {
             topic,
             count,
             level: state.currentLevel
-        });
+        }, DOM.quizResult);
         renderQuiz(data);
     } catch (err) {}
 }
@@ -670,7 +708,7 @@ async function handleCorrection() {
         const data = await apiCall('/correct', {
             text,
             level: state.currentLevel
-        });
+        }, DOM.correctResult);
         renderCorrection(data, text);
     } catch (err) {}
 }
