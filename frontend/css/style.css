@@ -761,7 +761,7 @@ body.keyboard-open .bottom-nav {
   display: flex;
   align-items: center;
   justify-content: space-around;
-  padding: 0 8px padding-bottom: env(safe-area-inset-bottom);
+  padding: 0 8px env(safe-area-inset-bottom);
   z-index: 100;
   max-width: var(--max-width);
   margin: 0 auto;
@@ -1133,4 +1133,102 @@ body.keyboard-open .bottom-nav {
 .flashcard-back {
   transform: rotateY(180deg);
   background: linear-gradient(135deg, rgba(30, 41, 59, 0.95), rgba(15, 23, 42, 0.95));
+}
+
+/* --------------------------------------------------------------------------
+   12. CONSISTENT TOOL SCREENS & ACCESSIBILITY POLISH
+   -------------------------------------------------------------------------- */
+.card-container {
+  background: var(--gradient-card);
+  border: 1px solid var(--border-glass);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-md);
+  padding: clamp(18px, 4vw, 28px);
+  backdrop-filter: blur(14px);
+}
+
+.card-container h2 {
+  letter-spacing: -0.35px;
+  line-height: 1.25;
+}
+
+.card-container > p {
+  line-height: 1.55;
+}
+
+button,
+input,
+select,
+textarea {
+  min-height: 44px;
+}
+
+textarea {
+  resize: vertical;
+}
+
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+.flashcard-wrapper:focus-visible {
+  outline: 3px solid rgba(52, 211, 153, 0.65);
+  outline-offset: 3px;
+}
+
+.level-badge-btn:hover,
+.nav-item:hover {
+  color: var(--text-primary);
+  background: var(--primary-light);
+}
+
+.btn-primary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 22px rgba(16, 185, 129, 0.28);
+}
+
+.btn-primary:disabled,
+.chip-btn:disabled,
+.audio-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+@media (max-width: 480px) {
+  .main-content {
+    padding: 12px 12px calc(var(--bottom-nav-height) + 28px);
+  }
+
+  .card-container {
+    border-radius: var(--radius-lg);
+  }
+
+  .card-container div[style*="display:flex"]:has(> .custom-input + .btn-primary) {
+    align-items: stretch;
+  }
+
+  .card-container div[style*="display:flex"] > .btn-primary {
+    width: auto;
+    flex: 0 0 auto;
+    padding-inline: 16px;
+  }
+
+  .nav-item {
+    padding-inline: 6px;
+  }
+
+  .nav-item span {
+    font-size: 10px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
 }

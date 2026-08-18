@@ -184,16 +184,20 @@ function switchTab(tabId) {
     DOM.navItems.forEach(item => {
         if (item.dataset.tab === tabId) {
             item.classList.add('active');
+            item.setAttribute('aria-current', 'page');
         } else {
             item.classList.remove('active');
+            item.removeAttribute('aria-current');
         }
     });
 
     DOM.tabContents.forEach(content => {
         if (content.id === tabId) {
             content.classList.add('active');
+            content.setAttribute('aria-hidden', 'false');
         } else {
             content.classList.remove('active');
+            content.setAttribute('aria-hidden', 'true');
         }
     });
 
@@ -455,6 +459,8 @@ async function handleChatSend() {
     const text = DOM.chatInput.value.trim();
     if (!text || state.isLoading) return;
 
+    state.isLoading = true;
+    if (DOM.chatSendBtn) DOM.chatSendBtn.disabled = true;
     appendChatMessage('user', text);
     DOM.chatInput.value = '';
 
@@ -478,6 +484,9 @@ async function handleChatSend() {
     } catch (err) {
         if (typingRow) typingRow.remove();
         appendChatMessage('bot', 'Connection error. Please try again.');
+    } finally {
+        state.isLoading = false;
+        if (DOM.chatSendBtn) DOM.chatSendBtn.disabled = false;
     }
 }
 
@@ -1159,6 +1168,7 @@ window.removeFlashcard = removeFlashcard;
 document.addEventListener('DOMContentLoaded', () => {
     setupEventListeners();
     updateLevelUI(state.currentLevel);
+    switchTab(state.currentTab);
     window.DOM = DOM;
     renderFlashcards();
     const clearBtn = document.getElementById('clearDeckBtn');
